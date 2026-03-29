@@ -29,7 +29,7 @@ export default async function HomePage() {
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
               A steady place to keep track of how things have been.
             </h1>
-            <p className="max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
+            <p className="max-w-xl text-base leading-7 text-slate-800 sm:text-lg">
               Solace gives you one private place to keep the details, especially on days when you do not want to think too hard about where to put them.
             </p>
           </div>
@@ -43,23 +43,23 @@ export default async function HomePage() {
             {homeDetails.map((detail) => (
               <div
                 key={detail}
-                className="rounded-[1.5rem] bg-white/72 px-4 py-4 text-sm leading-6 text-slate-700"
+                className="rounded-[1.5rem] bg-white/78 px-4 py-4 text-sm leading-6 font-medium text-slate-800"
               >
                 {detail}
               </div>
             ))}
           </div>
-          <p className="text-sm leading-6 text-slate-600">
+          <p className="text-sm leading-6 text-slate-700">
             Private by default. No medical advice.
           </p>
         </div>
 
-        <Card className="space-y-5 rounded-[2rem] bg-slate-900/90 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
+        <Card className="space-y-5 rounded-[2rem] bg-slate-900/92 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
           <div className="space-y-2">
-            <p className="text-sm font-medium tracking-[0.22em] text-slate-300 uppercase">
+            <p className="text-sm font-semibold tracking-[0.22em] text-slate-200 uppercase">
               What you can keep here
             </p>
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="text-2xl font-semibold tracking-tight text-white">
               One place for the details that matter.
             </h2>
           </div>
@@ -67,19 +67,19 @@ export default async function HomePage() {
             {homeHighlights.map((feature) => (
               <div
                 key={feature}
-                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                className="flex items-start gap-3 rounded-2xl border border-white/12 bg-white/7 p-4"
               >
                 <div className="mt-1 h-2.5 w-2.5 rounded-full bg-secondary-300" />
-                <p className="text-sm leading-6 text-slate-200">{feature}</p>
+                <p className="text-sm leading-6 font-medium text-slate-100">{feature}</p>
               </div>
             ))}
           </div>
-          <div className="rounded-2xl border border-lavender-300/30 bg-lavender-200/10 p-4 text-sm leading-6 text-slate-200">
+          <div className="rounded-2xl border border-lavender-300/45 bg-lavender-200/18 p-4 text-sm leading-6 font-medium text-slate-50">
             Daily entries, journal, timeline, and export are already ready when you are.
           </div>
           <Link
             href="/signup"
-            className="inline-flex text-sm font-medium text-primary-100 transition hover:text-white"
+            className="inline-flex text-sm font-semibold text-primary-100 transition hover:text-white"
           >
             Start with email and password
           </Link>
