@@ -30,8 +30,8 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => matchesRoute(pathname, route));
+  const isProtectedRoute = protectedRoutes.some((route) => matchesRoute(pathname, route));
 
   if (!user && isProtectedRoute) {
     const loginUrl = new URL("/login", request.url);
@@ -44,6 +44,10 @@ export async function proxy(request: NextRequest) {
   }
 
   return response;
+}
+
+function matchesRoute(pathname: string, route: string) {
+  return pathname === route || pathname.startsWith(`${route}/`);
 }
 
 export const config = {
