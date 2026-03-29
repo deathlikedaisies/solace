@@ -47,7 +47,7 @@ export function DailyCheckInForm({
             Daily check-in
           </h2>
           <p className="text-sm leading-6 text-slate-600">
-            Save today&apos;s dose and symptoms in under a minute.
+            A brief note for today.
           </p>
         </div>
         {initialLog ? (
@@ -115,7 +115,7 @@ export function DailyCheckInForm({
           <div>
             <h3 className="text-sm font-medium text-slate-700">Symptoms</h3>
             <p className="text-xs leading-5 text-slate-500">
-              Tap all that feel relevant today.
+              Choose what stood out today.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -154,7 +154,7 @@ export function DailyCheckInForm({
             name="notes"
             defaultValue={initialLog?.notes ?? ""}
             className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/92 px-4 py-3 text-sm text-slate-900"
-            placeholder="Anything you want future-you to notice."
+            placeholder="Anything you want to remember later."
           />
         </label>
 
@@ -164,22 +164,22 @@ export function DailyCheckInForm({
           </div>
         ) : null}
 
-        <div
-          className={cn(
-            "rounded-2xl px-4 py-3 text-sm",
-            state.status === "error" && "bg-danger-100 text-danger-500",
-            state.status === "success" && "bg-success-100 text-success-500",
-            state.status === "idle" && "hidden",
-          )}
-        >
-          {state.message}
-        </div>
+        {state.status === "error" ? (
+          <div className="rounded-[1.5rem] bg-danger-100 px-4 py-3 text-sm leading-6 text-danger-500">
+            {state.message}
+          </div>
+        ) : null}
 
         {state.status === "success" ? (
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/timeline" variant="secondary">
-              View timeline
-            </ButtonLink>
+          <div className="rounded-[1.75rem] border border-success-500/15 bg-success-100/85 px-5 py-4 text-success-500">
+            <p className="text-sm font-medium">Entry saved.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-700">{state.message}</p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <ButtonLink href="/timeline">View timeline</ButtonLink>
+              <ButtonLink href="/dashboard" variant="secondary">
+                Back to dashboard
+              </ButtonLink>
+            </div>
           </div>
         ) : null}
 
@@ -220,4 +220,3 @@ function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
     </label>
   );
 }
-

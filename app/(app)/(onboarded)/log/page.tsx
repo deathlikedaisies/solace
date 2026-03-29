@@ -24,48 +24,48 @@ export default async function LogPage() {
 
       <div className="space-y-6">
         <Card className="rounded-[2rem] p-6">
-          <p className="text-xs font-medium tracking-[0.22em] text-slate-400 uppercase">
-            Logging notes
+          <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
+            Today
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-            One entry per day for now.
+            Keep it brief if that helps.
           </h2>
-          <div className="mt-5 space-y-3 text-sm text-slate-600">
-            <div className="rounded-[1.5rem] bg-warm-100 px-4 py-3">
-              Saving the same date updates that day&apos;s check-in.
+          <div className="mt-5 space-y-3 text-sm text-slate-700">
+            <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
+              Saving the same date updates that entry.
             </div>
-            <div className="rounded-[1.5rem] bg-warm-100 px-4 py-3">
-              Current profile dose: {formatDose(profile.current_dose)}
+            <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
+              Current dose on file: {formatDose(profile.current_dose)}
             </div>
-            <div className="rounded-[1.5rem] bg-primary-50 px-4 py-3 leading-6">
-              Keep notes brief if you want fast daily logging on mobile.
+            <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 leading-6">
+              A few words are enough. You can always come back later.
             </div>
           </div>
         </Card>
 
         <Card className="rounded-[2rem] p-6">
           <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-            Recent check-ins
+            Recent entries
           </h2>
           <div className="mt-4 space-y-3">
             {recentLogs.length ? (
               recentLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="rounded-[1.5rem] bg-warm-100 px-4 py-3 text-sm text-slate-600"
+                  className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm text-slate-700"
                 >
                   <p className="font-medium text-slate-900">
                     {formatDate(log.log_date)}
                   </p>
                   <p className="mt-1">
-                    Dose {formatDose(log.dose)}. Anxiety {log.anxiety}/10. Mood {log.mood}/10.
+                    {formatDose(log.dose)} - Anxiety {log.anxiety}/10 - Mood {log.mood}/10
                   </p>
-                  <p className="mt-1">Sleep {formatHours(log.sleep_hours)}.</p>
+                  <p className="mt-1 text-slate-600">Sleep {formatHours(log.sleep_hours)}</p>
                 </div>
               ))
             ) : (
-              <p className="rounded-[1.5rem] bg-warm-100 px-4 py-3 text-sm text-slate-500">
-                Your saved check-ins will appear here after the first entry.
+              <p className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm text-slate-500">
+                Your last few entries will settle here.
               </p>
             )}
           </div>

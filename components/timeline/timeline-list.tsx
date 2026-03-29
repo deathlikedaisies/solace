@@ -8,7 +8,7 @@ type TimelineListProps = {
 
 export function TimelineList({ items }: TimelineListProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {items.map((item, index) => {
         const previousDate = index > 0 ? items[index - 1]?.date : null;
         const showDateHeader = item.date !== previousDate;
@@ -16,17 +16,17 @@ export function TimelineList({ items }: TimelineListProps) {
         return (
           <div key={item.id}>
             {showDateHeader ? (
-              <div className="mb-3 px-1">
-                <p className="text-xs font-medium tracking-[0.22em] text-slate-400 uppercase">
+              <div className="mb-4 px-1">
+                <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
                   {formatDate(item.date)}
                 </p>
               </div>
             ) : null}
-            <div className="grid grid-cols-[auto_1fr] gap-4">
+            <div className="grid grid-cols-[auto_1fr] gap-4 sm:gap-5">
               <div className="flex flex-col items-center">
                 <div className={cn("mt-2 h-3 w-3 rounded-full", markerClassName(item))} />
                 {index < items.length - 1 ? (
-                  <div className="mt-2 min-h-24 w-px flex-1 bg-slate-200" />
+                  <div className="mt-2 min-h-28 w-px flex-1 bg-slate-200/90" />
                 ) : null}
               </div>
               <Card className="rounded-[1.75rem] p-5 sm:p-6">
@@ -42,12 +42,12 @@ export function TimelineList({ items }: TimelineListProps) {
                         >
                           {labelForItem(item)}
                         </span>
-                        <span className="rounded-full bg-warm-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        <span className="rounded-full bg-warm-100/90 px-3 py-1 text-xs font-medium text-slate-700">
                           {formatDose(item.dose)}
                         </span>
                         {item.kind === "log" && item.severeFlag ? (
                           <span className="rounded-full bg-danger-100 px-3 py-1 text-xs font-medium text-danger-500">
-                            Safety prompt shown
+                            Extra support note shown
                           </span>
                         ) : null}
                       </div>
@@ -59,7 +59,7 @@ export function TimelineList({ items }: TimelineListProps) {
                   </div>
                 </div>
                 {"note" in item && item.note ? (
-                  <div className="mt-4 rounded-[1.5rem] bg-warm-100 px-4 py-3 text-sm leading-6 text-slate-600">
+                  <div className="mt-4 rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm leading-6 text-slate-700">
                     {item.note}
                   </div>
                 ) : null}
@@ -74,22 +74,22 @@ export function TimelineList({ items }: TimelineListProps) {
 
 function labelForItem(item: TimelineItem) {
   if (item.kind === "log") {
-    return "Daily log";
+    return "Daily entry";
   }
 
   if (item.kind === "hold") {
-    return "Hold event";
+    return "Stable period";
   }
 
   if (item.eventType === "reduction") {
-    return "Dose reduction";
+    return "Reduction";
   }
 
   if (item.eventType === "initial") {
-    return "Starting dose";
+    return "Starting point";
   }
 
-  return "Dose event";
+  return "Change";
 }
 
 function markerClassName(item: TimelineItem) {

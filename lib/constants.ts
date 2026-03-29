@@ -45,9 +45,9 @@ export const navItems = [
 ] as const;
 
 export const homeHighlights = [
-  "A calm private space for benzodiazepine taper tracking",
-  "Fast daily logging designed for low friction on mobile",
-  "Dose, symptom, mood, and sleep patterns shown side by side",
+  "A private space for dose, symptom, mood, and sleep notes",
+  "Quick daily entries that stay easy to return to",
+  "Patterns that help you notice what tends to follow a dose change",
 ] as const;
 
 export const safetyPrompt =

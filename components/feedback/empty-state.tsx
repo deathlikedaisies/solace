@@ -23,13 +23,10 @@ export function EmptyState({
   return (
     <Card className={cn("rounded-[2rem] p-6 sm:p-8", className)}>
       <div className="mx-auto max-w-xl text-center sm:text-left">
-        <p className="text-xs font-medium tracking-[0.22em] text-slate-400 uppercase">
-          Nothing here yet
-        </p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
           {title}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-slate-500">{description}</p>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{description}</p>
         {actionHref && actionLabel ? (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link

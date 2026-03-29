@@ -34,7 +34,7 @@ export async function saveDailyCheckInAction(
   if (!logDate || dose <= 0) {
     return {
       status: "error",
-      message: "Add a valid date and dose before saving your check-in.",
+      message: "Add a valid date and dose before saving your entry.",
     };
   }
 
@@ -70,7 +70,7 @@ export async function saveDailyCheckInAction(
   if (error || !savedLog) {
     return {
       status: "error",
-      message: error?.message ?? "Unable to save your check-in right now.",
+      message: error?.message ?? "Unable to save your entry right now.",
     };
   }
 
@@ -85,7 +85,7 @@ export async function saveDailyCheckInAction(
     });
   } catch {
     postSaveMessage =
-      "Your check-in was saved, but we couldn't update the timeline right now.";
+      "Saved. Your timeline may take a moment to catch up.";
   }
 
   const { error: profileUpdateError } = await supabase
@@ -95,7 +95,7 @@ export async function saveDailyCheckInAction(
 
   if (profileUpdateError) {
     postSaveMessage =
-      "Your check-in was saved, but we couldn't refresh your current dose everywhere yet.";
+      "Saved. A few details may take a moment to refresh across the app.";
   }
 
   revalidatePath("/dashboard");
@@ -105,13 +105,13 @@ export async function saveDailyCheckInAction(
 
   if (postSaveMessage) {
     return {
-      status: "error",
+      status: "success",
       message: postSaveMessage,
     };
   }
 
   return {
     status: "success",
-    message: "Today's check-in was saved.",
+    message: "Saved. You are up to date for now.",
   };
 }

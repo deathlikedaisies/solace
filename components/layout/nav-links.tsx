@@ -19,7 +19,7 @@ export function NavLinks() {
               key={item.href}
               href={item.href}
               className={cn(
-                "focus-ring rounded-full px-4 py-2 text-sm font-medium text-slate-500",
+                "focus-ring rounded-full px-4 py-2 text-sm font-medium text-slate-600",
                 active && "bg-primary-100 text-slate-900",
               )}
             >
@@ -28,7 +28,7 @@ export function NavLinks() {
           );
         })}
       </nav>
-      <nav className="fixed inset-x-0 bottom-20 z-40 mx-auto flex w-[calc(100%-1.5rem)] max-w-md items-center gap-1 rounded-full border border-white/80 bg-white/90 px-2 py-2 shadow-[0_14px_40px_rgba(55,68,86,0.14)] backdrop-blur md:hidden">
+      <nav className="flex gap-2 overflow-x-auto pb-1 md:hidden">
         {navItems.map((item) => {
           const active = pathname.startsWith(item.href);
 
@@ -37,8 +37,8 @@ export function NavLinks() {
               key={item.href}
               href={item.href}
               className={cn(
-                "focus-ring flex min-h-11 flex-1 items-center justify-center rounded-full px-2 py-2 text-sm font-medium text-slate-500",
-                active && "bg-primary-100 text-slate-900",
+                "focus-ring inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/75 px-4 py-2 text-sm font-medium text-slate-600",
+                active && "border-primary-200 bg-primary-100 text-slate-900",
               )}
             >
               {item.label}

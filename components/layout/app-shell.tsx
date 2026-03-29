@@ -17,21 +17,21 @@ export function AppShell({
   children,
   user,
   title = "A private place to track gently.",
-  subtitle = "Mobile-first authenticated shell",
+  subtitle = "Your private record of dose, symptoms, and patterns.",
 }: AppShellProps) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
       <Card className="rounded-[1.75rem] px-5 py-4 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-medium tracking-[0.24em] text-slate-400 uppercase">
+            <p className="text-xs font-medium tracking-[0.24em] text-slate-500 uppercase">
               Solace
             </p>
             <div>
               <h1 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
                 {title}
               </h1>
-              <p className="text-sm text-slate-500">{subtitle}</p>
+              <p className="text-sm text-slate-600">{subtitle}</p>
             </div>
           </div>
 
@@ -40,7 +40,7 @@ export function AppShell({
               <p className="truncate text-sm font-medium text-slate-700">
                 {user.email ?? "Signed in"}
               </p>
-              <p className="text-xs text-slate-400">Private account</p>
+              <p className="text-xs text-slate-500">Private account</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               <form action={signOutAction}>
@@ -62,7 +62,7 @@ export function AppShell({
           <NavLinks />
         </div>
       </Card>
-      <div className="flex flex-1 flex-col gap-6 pb-28 md:pb-8">{children}</div>
+      <div className="flex flex-1 flex-col gap-6 pb-8">{children}</div>
     </div>
   );
 }

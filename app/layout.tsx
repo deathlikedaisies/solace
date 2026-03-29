@@ -16,11 +16,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth">
       <body className="min-h-full bg-canvas text-ink font-sans antialiased">
-        <div className="relative min-h-screen overflow-x-hidden pb-28">
+        <div className="relative min-h-screen overflow-x-hidden">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(127,168,201,0.18),transparent_60%)]" />
           <div className="pointer-events-none absolute inset-x-0 top-24 h-80 bg-[radial-gradient(circle_at_center,rgba(143,191,163,0.14),transparent_60%)]" />
-          <div className="relative flex min-h-screen flex-col">{children}</div>
-          <DisclaimerBanner />
+          <div className="relative flex min-h-screen flex-col">
+            <div className="flex-1">{children}</div>
+            <DisclaimerBanner />
+          </div>
         </div>
       </body>
     </html>

@@ -11,8 +11,8 @@ export default async function ProtectedLayout({
   return (
     <AppShell
       user={user}
-      title="A calm space for daily taper tracking."
-      subtitle="Authenticated space for the core product routes"
+      title="A private space for daily taper notes."
+      subtitle="Dose changes, symptoms, and the days in between."
     >
       {children}
     </AppShell>

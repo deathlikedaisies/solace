@@ -11,11 +11,10 @@ export default function SignupPage() {
             Create your space
           </p>
           <h2 className="text-4xl font-semibold tracking-tight text-slate-900">
-            Start with a calm, private taper record.
+            Start a private record you can come back to.
           </h2>
           <p className="max-w-lg text-base leading-7 text-slate-700">
-            Create an account with email and password, then move into the
-            protected Solace experience.
+            Set up email and password, then begin keeping your taper notes in one place.
           </p>
           <p className="text-sm text-slate-600">
             Already have an account?{" "}
@@ -27,7 +26,7 @@ export default function SignupPage() {
         <div className="flex justify-center lg:justify-end">
           <AuthForm
             title="Create account"
-            description="Email and password only. No public profile, no community feed."
+            description="Email and password only. No public profile. No social features."
             submitLabel="Create account"
             action={signUpAction}
           />

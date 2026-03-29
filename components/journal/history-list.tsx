@@ -27,23 +27,23 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
   if (!logs.length) {
     return (
       <EmptyState
-        title="No journal entries yet"
-        description="Your daily check-ins will start building a quiet history here as soon as you save the first one."
+        title="No entries yet"
+        description="Your journal starts with the first note you save."
         actionHref="/log"
-        actionLabel="Save your first check-in"
+        actionLabel="Save your first entry"
       />
     );
   }
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)] sm:grid-cols-2 lg:grid-cols-[1.2fr_repeat(2,minmax(0,1fr))_auto] lg:items-end">
+      <div className="grid gap-4 rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)] sm:grid-cols-2 lg:grid-cols-[1.15fr_repeat(2,minmax(0,1fr))_auto] lg:items-end">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
-            Journal history
+            Entries
           </h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            Filter by date to review past entries without losing context.
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Narrow the view when you want to focus on a stretch of time.
           </p>
         </div>
         <label className="space-y-2">
@@ -85,47 +85,39 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-xs font-medium tracking-[0.22em] text-slate-400 uppercase">
+                  <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
                     {formatDate(log.log_date)}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-sm text-slate-600">
-                    <span className="rounded-full bg-primary-100 px-3 py-1">
-                      Dose {formatDose(log.dose)}
-                    </span>
-                    <span className="rounded-full bg-warm-100 px-3 py-1">
-                      Anxiety {log.anxiety}/10
-                    </span>
-                    <span className="rounded-full bg-warm-100 px-3 py-1">
-                      Mood {log.mood}/10
-                    </span>
-                    <span className="rounded-full bg-warm-100 px-3 py-1">
-                      Sleep {formatHours(log.sleep_hours)}
-                    </span>
-                    <span className="rounded-full bg-warm-100 px-3 py-1">
-                      Quality {log.sleep_quality}/10
-                    </span>
-                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-700">
+                    {formatDose(log.dose)} - Anxiety {log.anxiety}/10 - Mood {log.mood}/10 - Sleep {formatHours(log.sleep_hours)}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {log.symptoms.length
+                      ? `${log.symptoms.length} symptom${log.symptoms.length === 1 ? "" : "s"} noted`
+                      : "No symptoms marked"}
+                  </p>
                 </div>
                 {log.severe_flag ? (
                   <span className="rounded-full bg-danger-100 px-3 py-1 text-xs font-medium text-danger-500">
-                    Safety prompt shown
+                    Extra support note shown
                   </span>
                 ) : null}
               </div>
-              {log.symptoms.length ? (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {log.symptoms.map((symptom) => (
-                    <span
-                      key={`${log.id}-${symptom}`}
-                      className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs text-slate-700"
-                    >
-                      {symptom}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
+              <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
+                <span className="rounded-full bg-primary-100 px-3 py-1 text-slate-800">
+                  Sleep quality {log.sleep_quality}/10
+                </span>
+                {log.symptoms.map((symptom) => (
+                  <span
+                    key={`${log.id}-${symptom}`}
+                    className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs text-slate-700"
+                  >
+                    {symptom}
+                  </span>
+                ))}
+              </div>
               {log.notes ? (
-                <p className="mt-4 rounded-[1.5rem] bg-warm-100 px-4 py-3 text-sm leading-6 text-slate-600">
+                <p className="mt-4 rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm leading-6 text-slate-700">
                   {log.notes}
                 </p>
               ) : null}
@@ -133,8 +125,8 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
           ))
         ) : (
           <EmptyState
-            title="No entries match this range"
-            description="Try widening the dates or clear the filters to return to your full journal history."
+            title="Nothing matches those dates"
+            description="Try widening the range or clear the filters to see the full journal again."
             secondaryAction={
               <Link
                 href="/log"

@@ -7,8 +7,8 @@ import { getOptionalUser } from "@/lib/auth";
 
 const homeDetails = [
   "Starting and current dose tracked side by side",
-  "Daily symptom, mood, and sleep logging in one quick check-in",
-  "Simple charts that make reductions and flare-ups easier to spot",
+  "Daily symptom, mood, and sleep notes in one short entry",
+  "A timeline that makes changes and steadier stretches easier to spot",
 ] as const;
 
 export default async function HomePage() {
@@ -23,16 +23,14 @@ export default async function HomePage() {
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="space-y-6 rounded-[2rem] border border-white/70 bg-[rgba(251,248,243,0.82)] p-7 shadow-[0_24px_80px_rgba(54,66,82,0.08)] backdrop-blur sm:p-10">
           <div className="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-medium tracking-[0.24em] text-sky-700 uppercase">
-            Private taper tracking
+            Private taper journal
           </div>
           <div className="space-y-4">
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-              Solace is a calm private home for taper tracking.
+              A steady place to keep track of what this has been like.
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
-              Create an account, keep your entries private, and move through a
-              low-stimulation interface built to make daily tracking feel steady
-              and manageable.
+              Solace keeps your entries private and easy to return to, even on hard days.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -52,17 +50,17 @@ export default async function HomePage() {
             ))}
           </div>
           <p className="text-sm leading-6 text-slate-600">
-            Solace is private by default and does not provide medical advice.
+            Private by default. No medical advice.
           </p>
         </div>
 
         <Card className="space-y-5 rounded-[2rem] bg-slate-900/90 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
           <div className="space-y-2">
             <p className="text-sm font-medium tracking-[0.22em] text-slate-300 uppercase">
-              What Solace offers
+              What you can keep here
             </p>
             <h2 className="text-2xl font-semibold tracking-tight">
-              A calm and private first step
+              One place for the pieces that matter.
             </h2>
           </div>
           <div className="space-y-3">
@@ -77,8 +75,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="rounded-2xl border border-lavender-300/30 bg-lavender-200/10 p-4 text-sm leading-6 text-slate-200">
-            Authentication, onboarding, daily logging, dashboard views, journal history,
-            timeline tracking, and CSV export are now in place for the MVP.
+            Your account, onboarding, daily entries, journal, timeline, and export are already in place.
           </div>
           <Link
             href="/signup"

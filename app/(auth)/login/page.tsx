@@ -17,11 +17,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Welcome back
           </p>
           <h2 className="text-4xl font-semibold tracking-tight text-slate-900">
-            Pick up with today&apos;s check-in when you&apos;re ready.
+            Pick up where you left off.
           </h2>
           <p className="max-w-lg text-base leading-7 text-slate-700">
-            Solace keeps your taper records private and low-stimulation so daily
-            logging stays sustainable.
+            Your notes are here when you need them.
           </p>
           <p className="text-sm text-slate-600">
             New here?{" "}
@@ -33,7 +32,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="flex justify-center lg:justify-end">
           <AuthForm
             title="Log in"
-            description="Use your email and password to access your private tracker."
+            description="Use your email and password to open your private space."
             submitLabel="Log in"
             action={signInAction}
             next={params.next}
@@ -43,6 +42,3 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     </main>
   );
 }
-
-
-

@@ -7,7 +7,6 @@ import { getTimelineData } from "@/lib/data";
 export default async function TimelinePage() {
   const user = await requireUser("/timeline");
   const items = await getTimelineData(user.id);
-  const dailyLogs = items.filter((item) => item.kind === "log");
   const reductionEvents = items.filter(
     (item) => item.kind === "event" && item.eventType === "reduction",
   );
@@ -15,29 +14,37 @@ export default async function TimelinePage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard label="Timeline items" value={String(items.length)} />
-        <SummaryCard label="Daily logs" value={String(dailyLogs.length)} />
-        <SummaryCard label="Dose reductions" value={String(reductionEvents.length)} />
-        <SummaryCard label="Hold markers" value={String(holdEvents.length)} />
-      </div>
-
       <Card className="rounded-[2rem] p-6 sm:p-8">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-          Timeline
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-          Review your taper history in date order, with daily logs, recorded dose
-          events, and longer holds shown together in one calm view.
-        </p>
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+              Timeline
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              A simple view of what changed, what stayed steady, and what each day felt like.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <LegendPill tone="log">Daily entry</LegendPill>
+            <LegendPill tone="reduction">Reduction</LegendPill>
+            <LegendPill tone="hold">Stable period</LegendPill>
+            <LegendPill tone="change">Change</LegendPill>
+          </div>
+          {items.length ? (
+            <p className="text-sm text-slate-500">
+              {reductionEvents.length} reduction{reductionEvents.length === 1 ? "" : "s"}
+              {holdEvents.length ? ` and ${holdEvents.length} stable period${holdEvents.length === 1 ? "" : "s"}` : ""} in view.
+            </p>
+          ) : null}
+        </div>
       </Card>
 
       {items.length ? (
         <TimelineList items={items} />
       ) : (
         <EmptyState
-          title="Your timeline will build as you log"
-          description="Save daily check-ins or record dose changes in your data source, and they will appear here in chronological order."
+          title="Your timeline will build from here"
+          description="Once you start saving entries, this view will help you look back without having to piece it all together yourself."
           actionHref="/log"
           actionLabel="Open daily log"
         />
@@ -46,13 +53,19 @@ export default async function TimelinePage() {
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="rounded-[1.75rem] p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
-        {value}
-      </p>
-    </Card>
-  );
+function LegendPill({
+  children,
+  tone,
+}: {
+  children: React.ReactNode;
+  tone: "log" | "reduction" | "hold" | "change";
+}) {
+  const classes = {
+    log: "bg-primary-100 text-slate-800",
+    reduction: "bg-lavender-100 text-slate-800",
+    hold: "bg-secondary-100 text-slate-800",
+    change: "bg-warm-100 text-slate-700",
+  };
+
+  return <span className={`rounded-full px-3 py-1 ${classes[tone]}`}>{children}</span>;
 }

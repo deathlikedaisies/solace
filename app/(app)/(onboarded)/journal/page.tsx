@@ -17,9 +17,8 @@ export default async function JournalPage() {
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Journal
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-              Review past entries in a simple quiet history view and narrow the list
-              with basic date filters when you need less visual noise.
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Look back when you want context, not just numbers.
             </p>
           </div>
           <ExportLogsButton disabled={!logs.length} />
@@ -30,8 +29,8 @@ export default async function JournalPage() {
         <JournalHistory logs={logs} />
       ) : (
         <EmptyState
-          title="No journal entries yet"
-          description="Your daily check-ins will begin building a private history here once you save the first one."
+          title="No entries yet"
+          description="Your journal begins with the first entry you save."
           actionHref="/log"
           actionLabel="Open daily log"
           secondaryAction={<ExportLogsButton disabled />}
