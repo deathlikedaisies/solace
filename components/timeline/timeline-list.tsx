@@ -8,7 +8,7 @@ type TimelineListProps = {
 
 export function TimelineList({ items }: TimelineListProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {items.map((item, index) => {
         const previousDate = index > 0 ? items[index - 1]?.date : null;
         const showDateHeader = item.date !== previousDate;
@@ -16,7 +16,7 @@ export function TimelineList({ items }: TimelineListProps) {
         return (
           <div key={item.id}>
             {showDateHeader ? (
-              <div className="mb-4 px-1">
+              <div className="mb-3 px-1">
                 <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
                   {formatDate(item.date)}
                 </p>
@@ -26,7 +26,7 @@ export function TimelineList({ items }: TimelineListProps) {
               <div className="flex flex-col items-center">
                 <div className={cn("mt-2 h-3 w-3 rounded-full", markerClassName(item))} />
                 {index < items.length - 1 ? (
-                  <div className="mt-2 min-h-28 w-px flex-1 bg-slate-200/90" />
+                  <div className="mt-2 min-h-24 w-px flex-1 bg-slate-200/90" />
                 ) : null}
               </div>
               <Card className="rounded-[1.75rem] p-5 sm:p-6">

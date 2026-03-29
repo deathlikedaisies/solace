@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
 
+const defaultSuccessMessage = "You can come back later if anything changes.";
+
 type DailyCheckInFormProps = {
   profileDose: number;
   initialLog: DailyLog | null;
@@ -43,7 +45,7 @@ export function DailyCheckInForm({
     <Card className="rounded-[2rem] p-6 sm:p-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h2 className="text-[1.7rem] font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Daily check-in
           </h2>
           <p className="text-sm leading-6 text-slate-600">
@@ -57,7 +59,7 @@ export function DailyCheckInForm({
         ) : null}
       </div>
 
-      <form action={formAction} className="mt-6 space-y-5">
+      <form action={formAction} className="mt-7 space-y-6">
         <input type="hidden" name="symptoms" value={JSON.stringify(symptoms)} />
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -171,10 +173,15 @@ export function DailyCheckInForm({
         ) : null}
 
         {state.status === "success" ? (
-          <div className="rounded-[1.75rem] border border-success-500/15 bg-success-100/85 px-5 py-4 text-success-500">
-            <p className="text-sm font-medium">Entry saved.</p>
-            <p className="mt-1 text-sm leading-6 text-slate-700">{state.message}</p>
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="rounded-[1.75rem] border border-success-500/15 bg-success-100/85 px-5 py-5 text-success-500">
+            <p className="text-sm font-medium">Saved for today.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-700">
+              You can come back later if anything changes.
+            </p>
+            {state.message !== defaultSuccessMessage ? (
+              <p className="mt-2 text-sm leading-6 text-slate-600">{state.message}</p>
+            ) : null}
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/timeline">View timeline</ButtonLink>
               <ButtonLink href="/dashboard" variant="secondary">
                 Back to dashboard

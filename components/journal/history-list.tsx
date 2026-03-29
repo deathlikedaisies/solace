@@ -36,7 +36,7 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="grid gap-4 rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)] sm:grid-cols-2 lg:grid-cols-[1.15fr_repeat(2,minmax(0,1fr))_auto] lg:items-end">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
@@ -76,7 +76,7 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {filtered.length ? (
           filtered.map((log) => (
             <article
@@ -103,14 +103,14 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
                   </span>
                 ) : null}
               </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
-                <span className="rounded-full bg-primary-100 px-3 py-1 text-slate-800">
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-primary-100/80 px-2.5 py-1 text-xs text-slate-700">
                   Sleep quality {log.sleep_quality}/10
                 </span>
                 {log.symptoms.map((symptom) => (
                   <span
                     key={`${log.id}-${symptom}`}
-                    className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs text-slate-700"
+                    className="rounded-full border border-primary-200/70 bg-primary-50/75 px-2.5 py-1 text-xs text-slate-600"
                   >
                     {symptom}
                   </span>

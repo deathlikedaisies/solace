@@ -13,15 +13,15 @@ export default async function TimelinePage() {
   const holdEvents = items.filter((item) => item.kind === "hold");
 
   return (
-    <div className="space-y-6">
-      <Card className="rounded-[2rem] p-6 sm:p-8">
-        <div className="space-y-4">
+    <div className="space-y-5">
+      <Card className="rounded-[2rem] p-6 sm:p-7">
+        <div className="space-y-3">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               Timeline
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              A simple view of what changed, what stayed steady, and what each day felt like.
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              A simple view of what changed and what stayed steady.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
@@ -33,7 +33,9 @@ export default async function TimelinePage() {
           {items.length ? (
             <p className="text-sm text-slate-500">
               {reductionEvents.length} reduction{reductionEvents.length === 1 ? "" : "s"}
-              {holdEvents.length ? ` and ${holdEvents.length} stable period${holdEvents.length === 1 ? "" : "s"}` : ""} in view.
+              {holdEvents.length
+                ? ` and ${holdEvents.length} stable period${holdEvents.length === 1 ? "" : "s"}`
+                : ""} in view.
             </p>
           ) : null}
         </div>

@@ -84,8 +84,7 @@ export async function saveDailyCheckInAction(
       dose,
     });
   } catch {
-    postSaveMessage =
-      "Saved. Your timeline may take a moment to catch up.";
+    postSaveMessage = "Your timeline may take a moment to catch up.";
   }
 
   const { error: profileUpdateError } = await supabase
@@ -95,7 +94,7 @@ export async function saveDailyCheckInAction(
 
   if (profileUpdateError) {
     postSaveMessage =
-      "Saved. A few details may take a moment to refresh across the app.";
+      "A few details may take a moment to refresh across the app.";
   }
 
   revalidatePath("/dashboard");
@@ -103,15 +102,8 @@ export async function saveDailyCheckInAction(
   revalidatePath("/journal");
   revalidatePath("/timeline");
 
-  if (postSaveMessage) {
-    return {
-      status: "success",
-      message: postSaveMessage,
-    };
-  }
-
   return {
     status: "success",
-    message: "Saved. You are up to date for now.",
+    message: postSaveMessage ?? "You can come back later if anything changes.",
   };
 }

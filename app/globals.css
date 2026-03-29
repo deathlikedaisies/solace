@@ -49,6 +49,7 @@ body {
     linear-gradient(180deg, #f2eee7 0%, #f7f4ef 46%, #edf2f5 100%);
   color: var(--foreground);
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-weight: 400;
 }
 
 ::selection {

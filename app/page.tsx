@@ -6,9 +6,9 @@ import { ButtonLink } from "@/components/ui/button";
 import { getOptionalUser } from "@/lib/auth";
 
 const homeDetails = [
-  "Starting and current dose tracked side by side",
+  "Starting and current dose kept side by side",
   "Daily symptom, mood, and sleep notes in one short entry",
-  "A timeline that makes changes and steadier stretches easier to spot",
+  "A timeline that helps you notice changes and steadier stretches",
 ] as const;
 
 export default async function HomePage() {
@@ -27,10 +27,10 @@ export default async function HomePage() {
           </div>
           <div className="space-y-4">
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-              A steady place to keep track of what this has been like.
+              A steady place to keep track of how things have been.
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
-              Solace keeps your entries private and easy to return to, even on hard days.
+              Solace gives you one private place to keep the details, especially on days when you do not want to think too hard about where to put them.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -60,7 +60,7 @@ export default async function HomePage() {
               What you can keep here
             </p>
             <h2 className="text-2xl font-semibold tracking-tight">
-              One place for the pieces that matter.
+              One place for the details that matter.
             </h2>
           </div>
           <div className="space-y-3">
@@ -75,7 +75,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="rounded-2xl border border-lavender-300/30 bg-lavender-200/10 p-4 text-sm leading-6 text-slate-200">
-            Your account, onboarding, daily entries, journal, timeline, and export are already in place.
+            Daily entries, journal, timeline, and export are already ready when you are.
           </div>
           <Link
             href="/signup"
