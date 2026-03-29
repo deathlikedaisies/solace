@@ -13,14 +13,16 @@ export async function saveOnboardingAction(
 ): Promise<FormState> {
   const user = await requireUser("/onboarding");
   const benzoName = String(formData.get("benzoName") ?? "").trim();
-  const dose = Number(formData.get("currentDose") ?? 0);
+  const startingDose = Number(formData.get("startingDose") ?? 0);
+  const currentDose = Number(formData.get("currentDose") ?? 0);
   const taperStartDate = String(formData.get("taperStartDate") ?? "");
   const notes = String(formData.get("notes") ?? "").trim() || null;
 
-  if (!benzoName || !taperStartDate || dose <= 0) {
+  if (!benzoName || !taperStartDate || startingDose <= 0 || currentDose <= 0) {
     return {
       status: "error",
-      message: "Add your medication, current dose, and taper start date.",
+      message:
+        "Add your medication, taper starting dose, current dose, and taper start date.",
     };
   }
 
@@ -30,7 +32,8 @@ export async function saveOnboardingAction(
     {
       id: user.id,
       benzo_name: benzoName,
-      current_dose: dose,
+      starting_dose: startingDose,
+      current_dose: currentDose,
       taper_start_date: taperStartDate,
       notes,
     },
@@ -48,7 +51,7 @@ export async function saveOnboardingAction(
     await ensureInitialDoseEvent({
       userId: user.id,
       eventDate: taperStartDate,
-      dose,
+      dose: startingDose,
     });
   } catch {
     revalidatePath("/onboarding");

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/data";
+import { getProfile, isProfileComplete } from "@/lib/data";
 import { requireUser } from "@/lib/auth";
 
 export default async function OnboardedLayout({
@@ -10,7 +10,7 @@ export default async function OnboardedLayout({
   const user = await requireUser();
   const profile = await getProfile(user.id);
 
-  if (!profile) {
+  if (!isProfileComplete(profile)) {
     redirect("/onboarding");
   }
 

@@ -22,9 +22,9 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
         <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
           Set up your taper snapshot
         </h2>
-        <p className="max-w-2xl text-sm leading-6 text-slate-500">
-          This helps Solace prefill your daily check-ins and build a clear
-          timeline from the start.
+        <p className="max-w-2xl text-sm leading-6 text-slate-600">
+          Add where your taper started and where you are now so the charts and
+          timeline can show the bigger picture instead of only today.
         </p>
       </div>
 
@@ -36,8 +36,23 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
             type="text"
             name="benzoName"
             defaultValue={profile?.benzo_name ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
             placeholder="e.g. Diazepam"
+          />
+        </label>
+        <label className="space-y-2 sm:col-span-1">
+          <span className="text-sm font-medium text-slate-700">
+            Taper starting dose (mg)
+          </span>
+          <input
+            required
+            min="0.01"
+            step="0.01"
+            type="number"
+            name="startingDose"
+            defaultValue={profile?.starting_dose ?? profile?.current_dose ?? ""}
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
+            placeholder="10"
           />
         </label>
         <label className="space-y-2 sm:col-span-1">
@@ -49,7 +64,7 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
             type="number"
             name="currentDose"
             defaultValue={profile?.current_dose ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
             placeholder="0.50"
           />
         </label>
@@ -60,7 +75,7 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
             type="date"
             name="taperStartDate"
             defaultValue={profile?.taper_start_date ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
           />
         </label>
         <label className="space-y-2 sm:col-span-2">
@@ -69,7 +84,7 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
             name="notes"
             rows={5}
             defaultValue={profile?.notes ?? ""}
-            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-3 text-sm"
+            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900"
             placeholder="Anything you want to remember about your taper context."
           />
         </label>
@@ -91,4 +106,3 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
     </Card>
   );
 }
-

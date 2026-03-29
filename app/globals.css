@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f3ef;
+  --background: #f5f1ea;
   --foreground: #22313f;
 }
 
@@ -37,11 +37,16 @@
 }
 
 html {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top, rgba(127, 168, 201, 0.18), transparent 38%),
+    linear-gradient(180deg, #f2eee7 0%, #f7f4ef 46%, #edf2f5 100%);
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top, rgba(127, 168, 201, 0.16), transparent 34%),
+    radial-gradient(circle at 20% 24%, rgba(199, 184, 234, 0.16), transparent 28%),
+    linear-gradient(180deg, #f2eee7 0%, #f7f4ef 46%, #edf2f5 100%);
   color: var(--foreground);
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
 }
@@ -70,7 +75,7 @@ input[type="range"] {
 }
 
 .surface {
-  @apply border border-white/70 bg-white/70 backdrop-blur;
+  @apply border border-white/70 bg-[rgba(252,249,244,0.84)] backdrop-blur;
 }
 
 .soft-shadow {
@@ -80,4 +85,3 @@ input[type="range"] {
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
 }
-

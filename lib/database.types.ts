@@ -15,6 +15,7 @@ export interface Database {
         Row: {
           id: string;
           benzo_name: string;
+          starting_dose: number | null;
           current_dose: number;
           taper_start_date: string;
           notes: string | null;
@@ -24,6 +25,7 @@ export interface Database {
         Insert: {
           id: string;
           benzo_name: string;
+          starting_dose?: number | null;
           current_dose: number;
           taper_start_date: string;
           notes?: string | null;
@@ -33,6 +35,7 @@ export interface Database {
         Update: {
           id?: string;
           benzo_name?: string;
+          starting_dose?: number | null;
           current_dose?: number;
           taper_start_date?: string;
           notes?: string | null;

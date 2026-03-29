@@ -51,6 +51,10 @@ export async function getProfile(userId: string) {
   return data as Profile | null;
 }
 
+export function isProfileComplete(profile: Profile | null) {
+  return Boolean(profile && profile.starting_dose !== null);
+}
+
 export async function getProfileAndLogs(userId: string) {
   const supabase = await createServerSupabaseClient();
   const [{ data: profile, error: profileError }, { data: logs, error: logsError }] =
@@ -94,8 +98,7 @@ export async function getDashboardData(userId: string) {
       .from("dose_events")
       .select("*")
       .eq("user_id", userId)
-      .order("event_date", { ascending: false })
-      .limit(8),
+      .order("event_date", { ascending: true }),
   ]);
 
   if (profileError) {
@@ -111,6 +114,7 @@ export async function getDashboardData(userId: string) {
   }
 
   const allLogs = (logs as DailyLog[] | null) ?? [];
+  const allEvents = (events as DoseEvent[] | null) ?? [];
   const latestLog = allLogs.at(-1) ?? null;
   const todayLog = allLogs.find((log) => log.log_date === todayIso()) ?? null;
   const last7 = allLogs.slice(-7);
@@ -118,6 +122,7 @@ export async function getDashboardData(userId: string) {
     anxiety: average(last7.map((log) => log.anxiety)),
     mood: average(last7.map((log) => log.mood)),
     sleepHours: average(last7.map((log) => log.sleep_hours)),
+    symptomLoad: average(last7.map((log) => log.symptoms.length)),
   };
 
   return {
@@ -125,7 +130,8 @@ export async function getDashboardData(userId: string) {
     logs: allLogs,
     latestLog,
     todayLog,
-    recentEvents: (events as DoseEvent[] | null) ?? [],
+    events: allEvents,
+    recentEvents: allEvents.slice(-8).reverse(),
     averages,
     streak: computeCheckInStreak(allLogs),
   };
@@ -206,7 +212,9 @@ function average(values: number[]) {
     return 0;
   }
 
-  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1));
+  return Number(
+    (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1),
+  );
 }
 
 function computeCheckInStreak(logs: DailyLog[]) {

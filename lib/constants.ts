@@ -3,17 +3,39 @@ export const symptomOptions = [
   "Insomnia",
   "Headache",
   "Muscle tension",
+  "Muscle pain",
   "Nausea",
+  "GI upset",
   "Dizziness",
   "Palpitations",
   "Sensory sensitivity",
+  "Sound sensitivity",
+  "Visual sensitivity",
   "Tremor",
-  "Irritability",
+  "Sweating",
   "Brain fog",
+  "Fatigue",
+  "Irritability",
+  "Panic surges",
+  "Intrusive thoughts",
   "Depersonalization",
+  "Tingling or numbness",
+  "Burning skin",
+  "Tinnitus",
+  "Blurred vision",
+  "Akathisia",
+  "Confusion",
+  "Hallucinations",
+  "Seizure-like symptoms",
 ] as const;
 
-export const severeSymptoms = ["Palpitations", "Depersonalization"] as const;
+export const severeSymptoms = [
+  "Palpitations",
+  "Depersonalization",
+  "Confusion",
+  "Hallucinations",
+  "Seizure-like symptoms",
+] as const;
 
 export const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -25,7 +47,7 @@ export const navItems = [
 export const homeHighlights = [
   "A calm private space for benzodiazepine taper tracking",
   "Fast daily logging designed for low friction on mobile",
-  "A soft minimal interface without clinical language or noise",
+  "Dose, symptom, mood, and sleep patterns shown side by side",
 ] as const;
 
 export const safetyPrompt =

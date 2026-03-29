@@ -13,17 +13,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
       <div className="grid w-full max-w-5xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="space-y-4">
-          <p className="text-sm font-medium tracking-[0.22em] text-slate-400 uppercase">
+          <p className="text-sm font-medium tracking-[0.22em] text-slate-500 uppercase">
             Welcome back
           </p>
           <h2 className="text-4xl font-semibold tracking-tight text-slate-900">
             Pick up with today&apos;s check-in when you&apos;re ready.
           </h2>
-          <p className="max-w-lg text-base leading-7 text-slate-600">
+          <p className="max-w-lg text-base leading-7 text-slate-700">
             Solace keeps your taper records private and low-stimulation so daily
             logging stays sustainable.
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             New here?{" "}
             <Link className="font-medium text-primary-700" href="/signup">
               Create an account
@@ -43,3 +43,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     </main>
   );
 }
+
+
+

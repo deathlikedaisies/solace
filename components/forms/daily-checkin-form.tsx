@@ -5,7 +5,7 @@ import { ButtonLink, Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { saveDailyCheckInAction } from "@/lib/actions/logs";
 import { initialFormState } from "@/lib/form-state";
-import { safetyPrompt, symptomOptions } from "@/lib/constants";
+import { safetyPrompt, severeSymptoms, symptomOptions } from "@/lib/constants";
 import type { Database } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +35,9 @@ export function DailyCheckInForm({
     anxiety >= 9 ||
     mood <= 2 ||
     sleepQuality <= 2 ||
-    symptoms.includes("Palpitations") ||
-    symptoms.includes("Depersonalization");
+    symptoms.some((symptom) =>
+      severeSymptoms.includes(symptom as (typeof severeSymptoms)[number]),
+    );
 
   return (
     <Card className="rounded-[2rem] p-6 sm:p-8">
@@ -45,7 +46,7 @@ export function DailyCheckInForm({
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
             Daily check-in
           </h2>
-          <p className="text-sm leading-6 text-slate-500">
+          <p className="text-sm leading-6 text-slate-600">
             Save today&apos;s dose and symptoms in under a minute.
           </p>
         </div>
@@ -67,7 +68,7 @@ export function DailyCheckInForm({
               type="date"
               name="logDate"
               defaultValue={initialLog?.log_date ?? today}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
           <label className="space-y-2">
@@ -79,7 +80,7 @@ export function DailyCheckInForm({
               type="number"
               name="dose"
               defaultValue={initialLog?.dose ?? profileDose}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
           <ScoreField
@@ -105,7 +106,7 @@ export function DailyCheckInForm({
               type="number"
               name="sleepHours"
               defaultValue={initialLog?.sleep_hours ?? 7}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm"
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
         </div>
@@ -136,7 +137,7 @@ export function DailyCheckInForm({
                     "focus-ring rounded-full border px-4 py-2 text-sm",
                     active
                       ? "border-primary-300 bg-primary-100 text-slate-900"
-                      : "border-slate-200 bg-white text-slate-600 hover:border-primary-200",
+                      : "border-slate-200 bg-white/90 text-slate-700 hover:border-primary-200",
                   )}
                 >
                   {symptom}
@@ -152,7 +153,7 @@ export function DailyCheckInForm({
             rows={4}
             name="notes"
             defaultValue={initialLog?.notes ?? ""}
-            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-3 text-sm"
+            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/92 px-4 py-3 text-sm text-slate-900"
             placeholder="Anything you want future-you to notice."
           />
         </label>
@@ -219,3 +220,4 @@ function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
     </label>
   );
 }
+

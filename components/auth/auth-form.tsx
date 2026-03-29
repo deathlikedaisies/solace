@@ -27,13 +27,13 @@ export function AuthForm({
   return (
     <Card className="w-full max-w-md rounded-[2rem] p-7 sm:p-8">
       <div className="space-y-2">
-        <p className="text-xs font-medium tracking-[0.24em] text-slate-400 uppercase">
+        <p className="text-xs font-medium tracking-[0.24em] text-slate-500 uppercase">
           Solace
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
           {title}
         </h1>
-        <p className="text-sm leading-6 text-slate-500">{description}</p>
+        <p className="text-sm leading-6 text-slate-600">{description}</p>
       </div>
 
       <form action={formAction} className="mt-6 space-y-4">
@@ -44,7 +44,7 @@ export function AuthForm({
             required
             type="email"
             name="email"
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-400"
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900 placeholder:text-slate-500"
             placeholder="you@example.com"
           />
         </label>
@@ -55,7 +55,7 @@ export function AuthForm({
             type="password"
             name="password"
             minLength={8}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-400"
+            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900 placeholder:text-slate-500"
             placeholder="At least 8 characters"
           />
         </label>
@@ -76,4 +76,3 @@ export function AuthForm({
     </Card>
   );
 }
-

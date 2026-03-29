@@ -25,12 +25,27 @@ $$;
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   benzo_name text not null,
+  starting_dose double precision check (starting_dose > 0),
   current_dose double precision not null check (current_dose > 0),
   taper_start_date date not null,
   notes text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.profiles
+  add column if not exists starting_dose double precision;
+
+update public.profiles
+set starting_dose = current_dose
+where starting_dose is null;
+
+alter table public.profiles
+  drop constraint if exists profiles_starting_dose_positive;
+
+alter table public.profiles
+  add constraint profiles_starting_dose_positive
+  check (starting_dose is null or starting_dose > 0);
 
 create table if not exists public.daily_logs (
   id uuid primary key default gen_random_uuid(),
@@ -64,11 +79,13 @@ create index if not exists profiles_taper_start_idx on public.profiles (taper_st
 create index if not exists daily_logs_user_date_idx on public.daily_logs (user_id, log_date desc);
 create index if not exists dose_events_user_date_idx on public.dose_events (user_id, event_date desc);
 
+drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
 before update on public.profiles
 for each row
 execute function public.set_updated_at();
 
+drop trigger if exists daily_logs_set_updated_at on public.daily_logs;
 create trigger daily_logs_set_updated_at
 before update on public.daily_logs
 for each row

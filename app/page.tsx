@@ -5,6 +5,12 @@ import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { getOptionalUser } from "@/lib/auth";
 
+const homeDetails = [
+  "Starting and current dose tracked side by side",
+  "Daily symptom, mood, and sleep logging in one quick check-in",
+  "Simple charts that make reductions and flare-ups easier to spot",
+] as const;
+
 export default async function HomePage() {
   const user = await getOptionalUser();
 
@@ -15,7 +21,7 @@ export default async function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-6 sm:px-8 lg:justify-center">
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-        <div className="space-y-6 rounded-[2rem] border border-white/70 bg-white/75 p-7 shadow-[0_24px_80px_rgba(54,66,82,0.08)] backdrop-blur sm:p-10">
+        <div className="space-y-6 rounded-[2rem] border border-white/70 bg-[rgba(251,248,243,0.82)] p-7 shadow-[0_24px_80px_rgba(54,66,82,0.08)] backdrop-blur sm:p-10">
           <div className="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-medium tracking-[0.24em] text-sky-700 uppercase">
             Private taper tracking
           </div>
@@ -23,7 +29,7 @@ export default async function HomePage() {
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
               Solace is a calm private home for taper tracking.
             </h1>
-            <p className="max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+            <p className="max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
               Create an account, keep your entries private, and move through a
               low-stimulation interface built to make daily tracking feel steady
               and manageable.
@@ -35,12 +41,22 @@ export default async function HomePage() {
               Log in
             </ButtonLink>
           </div>
-          <p className="text-sm leading-6 text-slate-500">
+          <div className="grid gap-3 sm:grid-cols-3">
+            {homeDetails.map((detail) => (
+              <div
+                key={detail}
+                className="rounded-[1.5rem] bg-white/72 px-4 py-4 text-sm leading-6 text-slate-700"
+              >
+                {detail}
+              </div>
+            ))}
+          </div>
+          <p className="text-sm leading-6 text-slate-600">
             Solace is private by default and does not provide medical advice.
           </p>
         </div>
 
-        <Card className="space-y-5 rounded-[2rem] bg-slate-900/95 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.22)] sm:p-8">
+        <Card className="space-y-5 rounded-[2rem] bg-slate-900/90 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
           <div className="space-y-2">
             <p className="text-sm font-medium tracking-[0.22em] text-slate-300 uppercase">
               What Solace offers
@@ -62,11 +78,11 @@ export default async function HomePage() {
           </div>
           <div className="rounded-2xl border border-lavender-300/30 bg-lavender-200/10 p-4 text-sm leading-6 text-slate-200">
             Authentication, onboarding, daily logging, dashboard views, journal history,
-            and CSV export are now in place for the MVP.
+            timeline tracking, and CSV export are now in place for the MVP.
           </div>
           <Link
             href="/signup"
-            className="inline-flex text-sm font-medium text-sky-200 transition hover:text-white"
+            className="inline-flex text-sm font-medium text-primary-100 transition hover:text-white"
           >
             Start with email and password
           </Link>
