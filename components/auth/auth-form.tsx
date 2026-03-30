@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import type { FormState } from "@/lib/form-state";
 import { initialFormState } from "@/lib/form-state";
+import { Logo } from "@/components/branding/logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -27,9 +28,7 @@ export function AuthForm({
   return (
     <Card className="w-full max-w-md rounded-[2rem] p-7 sm:p-8">
       <div className="space-y-2">
-        <p className="text-xs font-medium tracking-[0.24em] text-slate-500 uppercase">
-          Solace
-        </p>
+        <Logo className="text-sm tracking-[0.14em] text-slate-600" />
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
           {title}
         </h1>

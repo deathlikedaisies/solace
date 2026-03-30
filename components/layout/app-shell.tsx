@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
+import { Logo } from "@/components/branding/logo";
 import { Card } from "@/components/ui/card";
 import { NavLinks } from "@/components/layout/nav-links";
 import { Button } from "@/components/ui/button";
@@ -24,9 +25,7 @@ export function AppShell({
       <Card className="rounded-[1.75rem] px-5 py-4 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-medium tracking-[0.24em] text-slate-500 uppercase">
-              Solace
-            </p>
+            <Logo className="text-sm tracking-[0.14em] text-slate-600" />
             <div>
               <h1 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
                 {title}
