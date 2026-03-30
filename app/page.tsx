@@ -54,7 +54,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <Card className="space-y-5 rounded-[2rem] bg-slate-900/92 p-7 text-slate-50 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
+        <Card tone="dark" className="space-y-5 rounded-[2rem] p-7 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
           <div className="space-y-2">
             <p className="text-sm font-semibold tracking-[0.22em] text-slate-200 uppercase">
               What you can keep here
