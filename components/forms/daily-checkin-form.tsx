@@ -5,13 +5,14 @@ import { ButtonLink, Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { saveDailyCheckInAction } from "@/lib/actions/logs";
 import { initialFormState } from "@/lib/form-state";
-import { safetyPrompt, severeSymptoms, symptomOptions } from "@/lib/constants";
-import type { Database } from "@/lib/database.types";
 import {
-  cn,
-  describeRelativeDate,
-  shiftIsoDate,
-} from "@/lib/utils";
+  safetyPrompt,
+  severeSymptoms,
+  symptomGroups,
+  symptomLabels,
+} from "@/lib/constants";
+import type { Database } from "@/lib/database.types";
+import { cn, describeRelativeDate, shiftIsoDate } from "@/lib/utils";
 
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
 
@@ -178,39 +179,45 @@ export function DailyCheckInForm({
           </label>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
             <h3 className="text-sm font-medium text-slate-700">Symptoms</h3>
-            <p className="text-xs leading-5 text-slate-500">
-              Choose what stood out most.
-            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {symptomOptions.map((symptom) => {
-              const active = symptoms.includes(symptom);
+          <div className="space-y-5">
+            {symptomGroups.map((group) => (
+              <div key={group.title} className="space-y-3">
+                <p className="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
+                  {group.title}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {group.symptoms.map((symptom) => {
+                    const active = symptoms.includes(symptom);
 
-              return (
-                <button
-                  key={symptom}
-                  type="button"
-                  onClick={() =>
-                    setSymptoms((current) =>
-                      current.includes(symptom)
-                        ? current.filter((item) => item !== symptom)
-                        : [...current, symptom],
-                    )
-                  }
-                  className={cn(
-                    "focus-ring rounded-full border px-4 py-2 text-sm",
-                    active
-                      ? "border-primary-300 bg-primary-100 text-slate-900"
-                      : "border-slate-200 bg-white/90 text-slate-700 hover:border-primary-200",
-                  )}
-                >
-                  {symptom}
-                </button>
-              );
-            })}
+                    return (
+                      <button
+                        key={symptom}
+                        type="button"
+                        onClick={() =>
+                          setSymptoms((current) =>
+                            current.includes(symptom)
+                              ? current.filter((item) => item !== symptom)
+                              : [...current, symptom],
+                          )
+                        }
+                        className={cn(
+                          "focus-ring rounded-full border px-4 py-2 text-sm",
+                          active
+                            ? "border-primary-300 bg-primary-100 text-slate-900"
+                            : "border-slate-200 bg-white/90 text-slate-700 hover:border-primary-200",
+                        )}
+                      >
+                        {symptomLabels[symptom]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

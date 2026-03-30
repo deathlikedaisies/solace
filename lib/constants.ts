@@ -29,6 +29,95 @@ export const symptomOptions = [
   "Seizure-like symptoms",
 ] as const;
 
+export type SymptomValue = (typeof symptomOptions)[number];
+
+export const symptomLabels: Record<SymptomValue, string> = {
+  Restlessness: "Restlessness",
+  Insomnia: "Insomnia",
+  Headache: "Headache",
+  "Muscle tension": "Muscle tension",
+  "Muscle pain": "Muscle pain",
+  Nausea: "Nausea",
+  "GI upset": "Stomach issues",
+  Dizziness: "Dizziness",
+  Palpitations: "Heart racing / pounding",
+  "Sensory sensitivity": "Sensitive to light or sound",
+  "Sound sensitivity": "Noise sensitivity",
+  "Visual sensitivity": "Light sensitivity",
+  Tremor: "Tremor",
+  Sweating: "Sweating",
+  "Brain fog": "Brain fog",
+  Fatigue: "Fatigue",
+  Irritability: "Irritability",
+  "Panic surges": "Panic surges",
+  "Intrusive thoughts": "Intrusive thoughts",
+  Depersonalization: "Feeling disconnected / unreal",
+  "Tingling or numbness": "Tingling or numbness",
+  "Burning skin": "Burning skin",
+  Tinnitus: "Tinnitus",
+  "Blurred vision": "Blurred vision",
+  Akathisia: "Restlessness (can't sit still)",
+  Confusion: "Mental confusion",
+  Hallucinations: "Seeing or hearing things",
+  "Seizure-like symptoms": "Seizure-like feelings",
+};
+
+export const symptomGroups: Array<{
+  title: string;
+  symptoms: SymptomValue[];
+}> = [
+  {
+    title: "Mind & mood",
+    symptoms: [
+      "Panic surges",
+      "Intrusive thoughts",
+      "Irritability",
+      "Depersonalization",
+      "Confusion",
+    ],
+  },
+  {
+    title: "Body & physical",
+    symptoms: [
+      "Headache",
+      "Muscle tension",
+      "Muscle pain",
+      "Tremor",
+      "Sweating",
+      "Palpitations",
+      "Nausea",
+      "GI upset",
+      "Burning skin",
+    ],
+  },
+  {
+    title: "Sensory",
+    symptoms: [
+      "Visual sensitivity",
+      "Sound sensitivity",
+      "Sensory sensitivity",
+      "Blurred vision",
+      "Tinnitus",
+    ],
+  },
+  {
+    title: "Sleep & fatigue",
+    symptoms: ["Insomnia", "Fatigue"],
+  },
+  {
+    title: "Neurological / other",
+    symptoms: [
+      "Dizziness",
+      "Brain fog",
+      "Tingling or numbness",
+      "Restlessness",
+      "Akathisia",
+      "Hallucinations",
+      "Seizure-like symptoms",
+    ],
+  },
+];
+
 export const severeSymptoms = [
   "Palpitations",
   "Depersonalization",
