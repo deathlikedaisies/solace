@@ -186,7 +186,7 @@ export function DailyCheckInForm({
           <div className="space-y-5">
             {symptomGroups.map((group) => (
               <div key={group.title} className="space-y-3">
-                <p className="text-xs font-medium tracking-[0.18em] text-slate-500 uppercase">
+                <p className="text-xs font-medium tracking-[0.01em] text-slate-500">
                   {group.title}
                 </p>
                 <div className="flex flex-wrap gap-2">

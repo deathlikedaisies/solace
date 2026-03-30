@@ -1,5 +1,4 @@
 export const symptomOptions = [
-  "Restlessness",
   "Insomnia",
   "Headache",
   "Muscle tension",
@@ -32,7 +31,6 @@ export const symptomOptions = [
 export type SymptomValue = (typeof symptomOptions)[number];
 
 export const symptomLabels: Record<SymptomValue, string> = {
-  Restlessness: "Restlessness",
   Insomnia: "Insomnia",
   Headache: "Headache",
   "Muscle tension": "Muscle tension",
@@ -53,13 +51,13 @@ export const symptomLabels: Record<SymptomValue, string> = {
   "Intrusive thoughts": "Intrusive thoughts",
   Depersonalization: "Feeling disconnected / unreal",
   "Tingling or numbness": "Tingling or numbness",
-  "Burning skin": "Burning skin",
+  "Burning skin": "Burning sensation",
   Tinnitus: "Tinnitus",
   "Blurred vision": "Blurred vision",
   Akathisia: "Restlessness (can't sit still)",
-  Confusion: "Mental confusion",
+  Confusion: "Trouble thinking clearly",
   Hallucinations: "Seeing or hearing things",
-  "Seizure-like symptoms": "Seizure-like feelings",
+  "Seizure-like symptoms": "Seizure-like sensations",
 };
 
 export const symptomGroups: Array<{
@@ -77,7 +75,7 @@ export const symptomGroups: Array<{
     ],
   },
   {
-    title: "Body & physical",
+    title: "Body",
     symptoms: [
       "Headache",
       "Muscle tension",
@@ -91,26 +89,24 @@ export const symptomGroups: Array<{
     ],
   },
   {
+    title: "Sleep",
+    symptoms: ["Insomnia", "Fatigue"],
+  },
+  {
     title: "Sensory",
     symptoms: [
       "Visual sensitivity",
       "Sound sensitivity",
-      "Sensory sensitivity",
       "Blurred vision",
       "Tinnitus",
     ],
   },
   {
-    title: "Sleep & fatigue",
-    symptoms: ["Insomnia", "Fatigue"],
-  },
-  {
-    title: "Neurological / other",
+    title: "Other",
     symptoms: [
       "Dizziness",
       "Brain fog",
       "Tingling or numbness",
-      "Restlessness",
       "Akathisia",
       "Hallucinations",
       "Seizure-like symptoms",
