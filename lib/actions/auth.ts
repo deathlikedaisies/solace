@@ -27,7 +27,7 @@ export async function signInAction(
   if (error) {
     return {
       status: "error",
-      message: error.message,
+      message: formatAuthError(error.message, "sign-in"),
     };
   }
 
@@ -70,7 +70,7 @@ export async function signUpAction(
   if (error) {
     return {
       status: "error",
-      message: error.message,
+      message: formatAuthError(error.message, "sign-up"),
     };
   }
 
@@ -81,7 +81,7 @@ export async function signUpAction(
   return {
     status: "success",
     message:
-      "Your account was created. If email confirmation is enabled, check your inbox before logging in.",
+      "Your account was created. If confirmation is enabled, check your inbox for a link back to the live site, then log in.",
   };
 }
 
@@ -100,8 +100,57 @@ function getSafeRedirectTarget(target: string) {
 }
 
 function getAuthRedirectBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") ||
-    defaultAuthRedirectBaseUrl
-  );
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (configuredUrl) {
+    const sanitized = sanitizeExternalUrl(configuredUrl);
+
+    if (sanitized) {
+      return sanitized;
+    }
+  }
+
+  return defaultAuthRedirectBaseUrl;
+}
+
+function sanitizeExternalUrl(value: string) {
+  try {
+    const url = new URL(value);
+
+    if (
+      url.hostname === "localhost" ||
+      url.hostname === "127.0.0.1" ||
+      url.hostname.endsWith(".local")
+    ) {
+      return null;
+    }
+
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return null;
+  }
+}
+
+function formatAuthError(message: string, mode: "sign-in" | "sign-up") {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("rate limit")) {
+    return "Too many email attempts were sent just now. Please wait a minute, then try again.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "Check your inbox and confirm your email before logging in.";
+  }
+
+  if (normalized.includes("user already registered")) {
+    return mode === "sign-up"
+      ? "This email already has an account. Try logging in instead."
+      : "This email already has an account. Try logging in.";
+  }
+
+  if (normalized.includes("invalid login credentials")) {
+    return "That email and password did not match. Try again.";
+  }
+
+  return message;
 }
