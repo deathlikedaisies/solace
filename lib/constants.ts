@@ -1,6 +1,7 @@
 export const symptomOptions = [
   "Insomnia",
   "Headache",
+  "Head pressure",
   "Muscle tension",
   "Muscle pain",
   "Nausea",
@@ -33,6 +34,7 @@ export type SymptomValue = (typeof symptomOptions)[number];
 export const symptomLabels: Record<SymptomValue, string> = {
   Insomnia: "Insomnia",
   Headache: "Headache",
+  "Head pressure": "Head pressure",
   "Muscle tension": "Muscle tension",
   "Muscle pain": "Muscle pain",
   Nausea: "Nausea",
@@ -55,7 +57,7 @@ export const symptomLabels: Record<SymptomValue, string> = {
   Tinnitus: "Tinnitus",
   "Blurred vision": "Blurred vision",
   Akathisia: "Restlessness (can't sit still)",
-  Confusion: "Trouble thinking clearly",
+  Confusion: "Hard to think clearly",
   Hallucinations: "Seeing or hearing things",
   "Seizure-like symptoms": "Seizure-like sensations",
 };
@@ -78,13 +80,14 @@ export const symptomGroups: Array<{
     title: "Body",
     symptoms: [
       "Headache",
+      "Head pressure",
       "Muscle tension",
       "Muscle pain",
-      "Tremor",
-      "Sweating",
-      "Palpitations",
       "Nausea",
       "GI upset",
+      "Palpitations",
+      "Sweating",
+      "Tremor",
       "Burning skin",
     ],
   },

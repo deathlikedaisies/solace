@@ -183,10 +183,10 @@ export function DailyCheckInForm({
           <div>
             <h3 className="text-sm font-medium text-slate-700">Symptoms</h3>
           </div>
-          <div className="space-y-5">
+          <div className="space-y-6">
             {symptomGroups.map((group) => (
-              <div key={group.title} className="space-y-3">
-                <p className="text-xs font-medium tracking-[0.01em] text-slate-500">
+              <div key={group.title} className="space-y-3 pt-1 first:pt-0">
+                <p className="text-[11px] font-normal tracking-[0.01em] text-slate-400">
                   {group.title}
                 </p>
                 <div className="flex flex-wrap gap-2">
