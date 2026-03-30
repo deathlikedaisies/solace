@@ -45,9 +45,9 @@ export const navItems = [
 ] as const;
 
 export const homeHighlights = [
-  "A private space for dose, symptom, mood, and sleep notes",
-  "Quick daily entries that stay easy to return to",
-  "Patterns that help you notice what tends to follow a dose change",
+  "Your dose, symptoms, mood, and sleep in one private record",
+  "Quick notes that stay easy to return to",
+  "A clearer view of what tends to follow a dose change",
 ] as const;
 
 export const safetyPrompt =

@@ -47,7 +47,7 @@ export function TimelineList({ items }: TimelineListProps) {
                         </span>
                         {item.kind === "log" && item.severeFlag ? (
                           <span className="rounded-full bg-danger-100 px-3 py-1 text-xs font-medium text-danger-500">
-                            Extra support note shown
+                            Harder day
                           </span>
                         ) : null}
                       </div>
@@ -74,22 +74,22 @@ export function TimelineList({ items }: TimelineListProps) {
 
 function labelForItem(item: TimelineItem) {
   if (item.kind === "log") {
-    return "Daily entry";
+    return "Daily note";
   }
 
   if (item.kind === "hold") {
-    return "Stable period";
+    return "Steady stretch";
   }
 
   if (item.eventType === "reduction") {
-    return "Reduction";
+    return "Lower dose";
   }
 
   if (item.eventType === "initial") {
-    return "Starting point";
+    return "Starting dose";
   }
 
-  return "Change";
+  return "Dose change";
 }
 
 function markerClassName(item: TimelineItem) {

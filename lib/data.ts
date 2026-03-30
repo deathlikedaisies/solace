@@ -1,6 +1,11 @@
 import type { DoseEventType, Database } from "@/lib/database.types";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { dateDiffInDays, formatDose, formatHours, todayIso } from "@/lib/utils";
+import {
+  dateDiffInDays,
+  formatDose,
+  formatHours,
+  todayIso,
+} from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
@@ -35,6 +40,11 @@ export type TimelineItem =
       title: string;
       detail: string;
     };
+
+export type DashboardInsight = {
+  id: string;
+  text: string;
+};
 
 export async function getProfile(userId: string) {
   const supabase = await createServerSupabaseClient();
@@ -134,6 +144,7 @@ export async function getDashboardData(userId: string) {
     recentEvents: allEvents.slice(-8).reverse(),
     averages,
     streak: computeCheckInStreak(allLogs),
+    insights: buildPatternInsights(allLogs, allEvents),
   };
 }
 
@@ -239,28 +250,109 @@ function computeCheckInStreak(logs: DailyLog[]) {
   return streak;
 }
 
+function buildPatternInsights(logs: DailyLog[], events: DoseEvent[]): DashboardInsight[] {
+  const insights: DashboardInsight[] = [];
+  const latestLog = logs.at(-1);
+
+  if (!latestLog) {
+    return insights;
+  }
+
+  const stableDoseDays = countStableDoseDays(logs);
+
+  if (stableDoseDays >= 4) {
+    insights.push({
+      id: "dose-steady",
+      text: `Dose has stayed at ${formatDose(latestLog.dose)} for ${stableDoseDays} days.`,
+    });
+  }
+
+  const recentReduction = [...events]
+    .reverse()
+    .find((event) => event.event_type === "reduction");
+
+  if (recentReduction) {
+    const beforeLogs = logs.filter((log) => log.log_date < recentReduction.event_date).slice(-4);
+    const afterLogs = logs.filter((log) => log.log_date >= recentReduction.event_date).slice(-4);
+
+    if (beforeLogs.length >= 2 && afterLogs.length >= 2) {
+      const beforeSleep = average(beforeLogs.map((log) => log.sleep_hours));
+      const afterSleep = average(afterLogs.map((log) => log.sleep_hours));
+
+      if (afterSleep <= beforeSleep - 0.5) {
+        insights.push({
+          id: "sleep-lower-since-change",
+          text: "Sleep has been a little lower since the last dose change.",
+        });
+      }
+    }
+  }
+
+  const recentSymptomLogs = logs.slice(-4);
+  const earlierSymptomLogs = logs.slice(-8, -4);
+
+  if (recentSymptomLogs.length >= 3 && earlierSymptomLogs.length >= 3) {
+    const recentSymptoms = average(recentSymptomLogs.map((log) => log.symptoms.length));
+    const earlierSymptoms = average(earlierSymptomLogs.map((log) => log.symptoms.length));
+
+    if (Math.abs(recentSymptoms - earlierSymptoms) < 0.75) {
+      insights.push({
+        id: "symptoms-similar",
+        text: "Symptoms have been about the same over the last few days.",
+      });
+    }
+  }
+
+  return insights.slice(0, 2);
+}
+
+function countStableDoseDays(logs: DailyLog[]) {
+  if (!logs.length) {
+    return 0;
+  }
+
+  let count = 1;
+
+  for (let index = logs.length - 1; index > 0; index -= 1) {
+    const current = logs[index];
+    const previous = logs[index - 1];
+
+    if (
+      current.dose === previous.dose &&
+      dateDiffInDays(current.log_date, previous.log_date) === 1
+    ) {
+      count += 1;
+      continue;
+    }
+
+    break;
+  }
+
+  return count;
+}
+
 function doseEventTitle(eventType: DoseEventType, dose: number) {
   if (eventType === "initial") {
-    return `Starting point set at ${formatDose(dose)}`;
+    return `Starting dose noted at ${formatDose(dose)}`;
   }
 
   if (eventType === "reduction") {
-    return `Dose reduced to ${formatDose(dose)}`;
+    return `Lower dose noted at ${formatDose(dose)}`;
   }
 
-  return `Dose updated to ${formatDose(dose)}`;
+  return `Dose changed to ${formatDose(dose)}`;
 }
 
 function timelineEventCopy(eventType: DoseEventType, dose: number) {
   if (eventType === "initial") {
-    return `Initial taper record added at ${formatDose(dose)}.`;
+    return `This is where your taper record begins at ${formatDose(dose)}.`;
   }
 
   if (eventType === "reduction") {
-    return `Reduction marker recorded at ${formatDose(dose)}.`;
+    return `A lower dose was recorded here at ${formatDose(dose)}.`;
   }
 
-  return `Dose increase or correction recorded at ${formatDose(dose)}.`;
+  return `A different dose was recorded here at ${formatDose(dose)}.`;
 }
 
 function inferHoldMarkers(logs: DailyLog[]): TimelineItem[] {
@@ -291,8 +383,8 @@ function inferHoldMarkers(logs: DailyLog[]): TimelineItem[] {
         kind: "hold",
         date: streakStart.log_date,
         dose: streakStart.dose,
-        title: "Hold marker",
-        detail: `${streakCount}-day hold at ${formatDose(streakStart.dose)}.`,
+        title: "Dose held steady",
+        detail: `${streakCount} days at ${formatDose(streakStart.dose)}.`,
       });
     }
 

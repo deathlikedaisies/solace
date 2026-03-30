@@ -21,21 +21,21 @@ export default async function TimelinePage() {
               Timeline
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              A simple view of what changed and what stayed steady.
+              A simple view of what shifted and what stayed steady.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
-            <LegendPill tone="log">Daily entry</LegendPill>
-            <LegendPill tone="reduction">Reduction</LegendPill>
-            <LegendPill tone="hold">Stable period</LegendPill>
-            <LegendPill tone="change">Change</LegendPill>
+            <LegendPill tone="log">Daily note</LegendPill>
+            <LegendPill tone="reduction">Lower dose</LegendPill>
+            <LegendPill tone="hold">Steady stretch</LegendPill>
+            <LegendPill tone="change">Dose change</LegendPill>
           </div>
           {items.length ? (
             <p className="text-sm text-slate-500">
-              {reductionEvents.length} reduction{reductionEvents.length === 1 ? "" : "s"}
+              {reductionEvents.length} dose change{reductionEvents.length === 1 ? "" : "s"}
               {holdEvents.length
-                ? ` and ${holdEvents.length} stable period${holdEvents.length === 1 ? "" : "s"}`
-                : ""} in view.
+                ? ` and ${holdEvents.length} steadier stretch${holdEvents.length === 1 ? "" : "es"}`
+                : ""} shown here.
             </p>
           ) : null}
         </div>
@@ -46,7 +46,7 @@ export default async function TimelinePage() {
       ) : (
         <EmptyState
           title="Your timeline will build from here"
-          description="Once you start saving entries, this view will help you look back without having to piece it all together yourself."
+          description="Once you start saving notes, this view will help you look back without piecing it together from memory."
           actionHref="/log"
           actionLabel="Open daily log"
         />

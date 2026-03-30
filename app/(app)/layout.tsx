@@ -8,13 +8,5 @@ export default async function ProtectedLayout({
 }>) {
   const user = await requireUser();
 
-  return (
-    <AppShell
-      user={user}
-      title="A private space for daily taper notes."
-      subtitle="Dose changes, symptoms, and the days in between."
-    >
-      {children}
-    </AppShell>
-  );
+  return <AppShell user={user}>{children}</AppShell>;
 }

@@ -6,9 +6,9 @@ import { ButtonLink } from "@/components/ui/button";
 import { getOptionalUser } from "@/lib/auth";
 
 const homeDetails = [
-  "Starting and current dose kept side by side",
-  "Daily symptom, mood, and sleep notes in one short entry",
-  "A timeline that helps you notice changes and steadier stretches",
+  "Where you started and where you are now",
+  "Short daily notes for symptoms, mood, and sleep",
+  "A clearer sense of what tends to change after a dose shift",
 ] as const;
 
 export default async function HomePage() {
@@ -23,14 +23,14 @@ export default async function HomePage() {
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="space-y-6 rounded-[2rem] border border-white/70 bg-[rgba(251,248,243,0.82)] p-7 shadow-[0_24px_80px_rgba(54,66,82,0.08)] backdrop-blur sm:p-10">
           <div className="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-medium tracking-[0.24em] text-sky-700 uppercase">
-            Private taper journal
+            Private notes for your taper
           </div>
           <div className="space-y-4">
             <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-              A steady place to keep track of how things have been.
+              A quiet place to keep track of how things have been.
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-800 sm:text-lg">
-              Solace gives you one private place to keep the details, especially on days when you do not want to think too hard about where to put them.
+              When days feel foggy or difficult, Solace keeps the dose, symptoms, sleep, and small details in one place.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -57,10 +57,10 @@ export default async function HomePage() {
         <Card className="space-y-5 rounded-[2rem] p-7 sm:p-8">
           <div className="space-y-2">
             <p className="text-sm font-semibold tracking-[0.22em] text-slate-600 uppercase">
-              What you can keep here
+              What stays here
             </p>
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-              One place for the details that matter.
+              The details you may want later.
             </h2>
           </div>
           <div className="space-y-3">
@@ -75,7 +75,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="rounded-2xl bg-primary-50/90 p-4 text-sm leading-6 font-medium text-slate-800">
-            Daily entries, journal, timeline, and export are already ready when you are.
+            When you want to look back, it is all still in one place.
           </div>
           <Link
             href="/signup"
