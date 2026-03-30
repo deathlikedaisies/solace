@@ -1,9 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/form-state";
+
+const defaultAuthRedirectBaseUrl = "https://solace-taper.vercel.app";
 
 export async function signInAction(
   _prevState: FormState,
@@ -39,8 +40,6 @@ export async function signUpAction(
 ): Promise<FormState> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get("origin");
 
   if (!email || !password) {
     return {
@@ -64,7 +63,7 @@ export async function signUpAction(
     email,
     password,
     options: {
-      emailRedirectTo: origin ? `${origin}/login` : undefined,
+      emailRedirectTo: `${getAuthRedirectBaseUrl()}/login`,
     },
   });
 
@@ -98,4 +97,11 @@ function getSafeRedirectTarget(target: string) {
   }
 
   return target;
+}
+
+function getAuthRedirectBaseUrl() {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") ||
+    defaultAuthRedirectBaseUrl
+  );
 }
