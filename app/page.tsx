@@ -54,12 +54,12 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <Card tone="dark" className="space-y-5 rounded-[2rem] p-7 shadow-[0_24px_80px_rgba(38,46,58,0.20)] sm:p-8">
+        <Card className="space-y-5 rounded-[2rem] p-7 sm:p-8">
           <div className="space-y-2">
-            <p className="text-sm font-semibold tracking-[0.22em] text-slate-200 uppercase">
+            <p className="text-sm font-semibold tracking-[0.22em] text-slate-600 uppercase">
               What you can keep here
             </p>
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
               One place for the details that matter.
             </h2>
           </div>
@@ -67,19 +67,19 @@ export default async function HomePage() {
             {homeHighlights.map((feature) => (
               <div
                 key={feature}
-                className="flex items-start gap-3 rounded-2xl border border-white/12 bg-white/7 p-4"
+                className="flex items-start gap-3 rounded-2xl bg-warm-100/85 p-4"
               >
-                <div className="mt-1 h-2.5 w-2.5 rounded-full bg-secondary-300" />
-                <p className="text-sm leading-6 font-medium text-slate-100">{feature}</p>
+                <div className="mt-1 h-2.5 w-2.5 rounded-full bg-secondary-400" />
+                <p className="text-sm leading-6 font-medium text-slate-800">{feature}</p>
               </div>
             ))}
           </div>
-          <div className="rounded-2xl border border-lavender-300/45 bg-lavender-200/18 p-4 text-sm leading-6 font-medium text-slate-50">
+          <div className="rounded-2xl bg-primary-50/90 p-4 text-sm leading-6 font-medium text-slate-800">
             Daily entries, journal, timeline, and export are already ready when you are.
           </div>
           <Link
             href="/signup"
-            className="inline-flex text-sm font-semibold text-primary-100 transition hover:text-white"
+            className="inline-flex text-sm font-semibold text-primary-700 transition hover:text-primary-500"
           >
             Start with email and password
           </Link>
