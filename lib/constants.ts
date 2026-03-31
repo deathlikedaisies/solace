@@ -69,11 +69,11 @@ export const symptomGroups: Array<{
   {
     title: "Mind & mood",
     symptoms: [
-      "Panic surges",
-      "Intrusive thoughts",
       "Irritability",
-      "Depersonalization",
+      "Intrusive thoughts",
       "Confusion",
+      "Depersonalization",
+      "Panic surges",
     ],
   },
   {
