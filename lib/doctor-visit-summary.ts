@@ -1,6 +1,5 @@
 import type { Database } from "@/lib/database.types";
 import { getSymptomLabel } from "@/lib/constants";
-import { getApproximateDiazepamEquivalent } from "@/lib/benzodiazepines";
 import {
   formatCompactDate,
   formatDate,
@@ -53,10 +52,6 @@ export function buildDoctorVisitSummary(
     .reverse()
     .map((log) => `${formatDate(log.log_date)}: ${compactNote(log.notes ?? "")}`);
   const impactLines = buildImpactLines(recentLogs, recentSleepAverage);
-  const diazepamReference = getApproximateDiazepamEquivalent(
-    profile.benzo_name,
-    profile.current_dose,
-  );
   const doctorLines = buildDoctorLines({
     profile,
     recentLogs,
@@ -69,20 +64,14 @@ export function buildDoctorVisitSummary(
     impactLines,
   });
 
-  const medicationLines = [
-    `Medication: ${profile.benzo_name}`,
-    `Taper start date: ${formatDate(profile.taper_start_date)}`,
-    `Current dose: ${formatDose(profile.current_dose)}`,
-  ];
-
-  if (diazepamReference) {
-    medicationLines.push(`Approximate diazepam reference: ${diazepamReference.summaryShort}`);
-  }
-
   const sections: DoctorVisitSummarySection[] = [
     {
       title: "Medication info",
-      lines: medicationLines,
+      lines: [
+        `Medication: ${profile.benzo_name}`,
+        `Taper start date: ${formatDate(profile.taper_start_date)}`,
+        `Current dose: ${formatDose(profile.current_dose)}`,
+      ],
     },
     {
       title: `Recent pattern (${recentWindowLabel})`,

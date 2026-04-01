@@ -42,6 +42,7 @@ export default async function LogPage({ searchParams }: LogPageProps) {
     <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
       <DailyCheckInForm
         profileDose={profile.current_dose}
+        profileMedication={profile.benzo_name}
         initialDate={initialDate}
         initialLog={initialLog}
         logs={logs}

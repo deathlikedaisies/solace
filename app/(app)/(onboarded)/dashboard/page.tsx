@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { MetricChart } from "@/components/charts/metric-chart";
-import { ApproximateDiazepamHelper } from "@/components/dose/approximate-diazepam-helper";
 import { DoctorVisitSummaryPanel } from "@/components/doctor-visit/doctor-visit-summary-panel";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ExportLogsButton } from "@/components/export/export-logs-button";
@@ -119,12 +118,9 @@ export default async function DashboardPage() {
           value={formatDose(profile.current_dose)}
           cue={changeCue}
           extra={
-            <ApproximateDiazepamHelper
-              medication={profile.benzo_name}
-              dose={profile.current_dose}
-              compact
-              className="mt-4"
-            />
+            <ButtonLink href="/log" variant="secondary" className="mt-4 w-full sm:w-auto">
+              View approximate equivalence
+            </ButtonLink>
           }
         />
         <OverviewCard
@@ -270,7 +266,6 @@ export default async function DashboardPage() {
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
                   Now at {formatDose(profile.current_dose)}
                 </div>
-
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
                   Taper start {formatCompactDate(profile.taper_start_date)}
                 </div>

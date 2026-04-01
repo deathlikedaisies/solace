@@ -3,6 +3,7 @@
 import { useActionState, useMemo, useState } from "react";
 import { ButtonLink, Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ApproximateDoseReferenceTool } from "@/components/dose/approximate-dose-reference-tool";
 import { saveDailyCheckInAction } from "@/lib/actions/logs";
 import { initialFormState } from "@/lib/form-state";
 import {
@@ -20,6 +21,7 @@ const defaultSuccessMessage = "You can come back later if anything changes.";
 
 type DailyCheckInFormProps = {
   profileDose: number;
+  profileMedication: string;
   initialDate: string;
   initialLog: DailyLog | null;
   logs: DailyLog[];
@@ -38,6 +40,7 @@ type DraftValues = {
 
 export function DailyCheckInForm({
   profileDose,
+  profileMedication,
   initialDate,
   initialLog,
   logs,
@@ -175,19 +178,25 @@ export function DailyCheckInForm({
               className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-slate-700">Dose (mg)</span>
-            <input
-              required
-              min="0.01"
-              step="0.01"
-              type="number"
-              name="dose"
-              value={dose}
-              onChange={(event) => setDose(Number(event.target.value))}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
+          <div className="space-y-2">
+            <label className="space-y-2">
+              <span className="text-sm font-medium text-slate-700">Dose (mg)</span>
+              <input
+                required
+                min="0.01"
+                step="0.01"
+                type="number"
+                name="dose"
+                value={dose}
+                onChange={(event) => setDose(Number(event.target.value))}
+                className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
+              />
+            </label>
+            <ApproximateDoseReferenceTool
+              defaultMedication={profileMedication}
+              defaultDose={dose}
             />
-          </label>
+          </div>
           <ScoreField
             label="Anxiety"
             name="anxiety"

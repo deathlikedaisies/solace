@@ -7,7 +7,7 @@ import type { Database } from "@/lib/database.types";
 import { benzodiazepineOptions, isKnownBenzodiazepine } from "@/lib/benzodiazepines";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ApproximateDiazepamHelper } from "@/components/dose/approximate-diazepam-helper";
+import { ApproximateDoseReferenceTool } from "@/components/dose/approximate-dose-reference-tool";
 import { cn } from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -87,10 +87,9 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
               placeholder="0.50"
             />
           </label>
-          <ApproximateDiazepamHelper
-            medication={benzoName}
-            dose={currentDose ? Number(currentDose) : null}
-            compact
+          <ApproximateDoseReferenceTool
+            defaultMedication={benzoName}
+            defaultDose={currentDose}
           />
         </div>
         <label className="space-y-2 sm:col-span-1">
