@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { MetricChart } from "@/components/charts/metric-chart";
+import { ApproximateDiazepamHelper } from "@/components/dose/approximate-diazepam-helper";
 import { DoctorVisitSummaryPanel } from "@/components/doctor-visit/doctor-visit-summary-panel";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ExportLogsButton } from "@/components/export/export-logs-button";
@@ -78,6 +80,7 @@ export default async function DashboardPage() {
       : latestLog
         ? "Pick up again when you are ready."
         : "The next check-in starts your run of days.";
+
   return (
     <div className="space-y-8">
       <Card className="rounded-[2rem] p-6 sm:p-8">
@@ -115,6 +118,14 @@ export default async function DashboardPage() {
           label="Current dose"
           value={formatDose(profile.current_dose)}
           cue={changeCue}
+          extra={
+            <ApproximateDiazepamHelper
+              medication={profile.benzo_name}
+              dose={profile.current_dose}
+              compact
+              className="mt-4"
+            />
+          }
         />
         <OverviewCard
           label="Symptoms recently"
@@ -259,6 +270,7 @@ export default async function DashboardPage() {
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
                   Now at {formatDose(profile.current_dose)}
                 </div>
+
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
                   Taper start {formatCompactDate(profile.taper_start_date)}
                 </div>
@@ -276,11 +288,13 @@ function OverviewCard({
   value,
   cue,
   tone = "default",
+  extra,
 }: {
   label: string;
   value: string;
   cue: string;
   tone?: "default" | "soft-alert";
+  extra?: ReactNode;
 }) {
   return (
     <Card className="rounded-[1.75rem] p-5 sm:p-6">
@@ -296,11 +310,12 @@ function OverviewCard({
       >
         {cue}
       </p>
+      {extra}
     </Card>
   );
 }
 
-function DetailPill({ children }: { children: React.ReactNode }) {
+function DetailPill({ children }: { children: ReactNode }) {
   return (
     <div className="rounded-[1.25rem] bg-warm-100/90 px-4 py-3 text-sm text-slate-700">
       {children}

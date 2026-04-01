@@ -22,13 +22,15 @@ export default async function OnboardingPage() {
           Start with the fuller picture.
         </h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Solace works best when it knows both the dose you started tapering from
-          and the dose you are on now. That makes the timeline and charts easier
-          to read later.
+          Solace works best when it knows the medication you are tracking, the dose you
+          started tapering from, and the dose you are on now.
         </p>
         <div className="mt-6 space-y-3 text-sm text-slate-700">
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-            Benzo name, taper starting dose, and current dose
+            Medication, taper starting dose, and current dose
+          </div>
+          <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
+            A quiet diazepam reference, shown as approximate only when available
           </div>
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
             Taper start date for your first timeline marker

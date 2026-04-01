@@ -1,19 +1,31 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { saveOnboardingAction } from "@/lib/actions/profile";
 import { initialFormState } from "@/lib/form-state";
 import type { Database } from "@/lib/database.types";
+import { benzodiazepineOptions, isKnownBenzodiazepine } from "@/lib/benzodiazepines";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ApproximateDiazepamHelper } from "@/components/dose/approximate-diazepam-helper";
 import { cn } from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
+const otherMedication = "Other / not listed";
 
 export function OnboardingForm({ profile }: { profile: Profile | null }) {
   const [state, formAction, pending] = useActionState(
     saveOnboardingAction,
     initialFormState,
+  );
+  const [benzoName, setBenzoName] = useState<string>(
+    profile?.benzo_name && isKnownBenzodiazepine(profile.benzo_name)
+      ? profile.benzo_name
+      : otherMedication,
+  );
+  const [currentDose, setCurrentDose] = useState(
+    profile?.current_dose ? String(profile.current_dose) : "",
   );
 
   return (
@@ -30,15 +42,20 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
 
       <form action={formAction} className="mt-6 grid gap-4 sm:grid-cols-2">
         <label className="space-y-2 sm:col-span-1">
-          <span className="text-sm font-medium text-slate-700">Benzo name</span>
-          <input
+          <span className="text-sm font-medium text-slate-700">Medication</span>
+          <select
             required
-            type="text"
             name="benzoName"
-            defaultValue={profile?.benzo_name ?? ""}
+            value={benzoName}
+            onChange={(event) => setBenzoName(event.target.value)}
             className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
-            placeholder="e.g. Diazepam"
-          />
+          >
+            {benzodiazepineOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="space-y-2 sm:col-span-1">
           <span className="text-sm font-medium text-slate-700">
@@ -55,19 +72,27 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
             placeholder="10"
           />
         </label>
-        <label className="space-y-2 sm:col-span-1">
-          <span className="text-sm font-medium text-slate-700">Current dose (mg)</span>
-          <input
-            required
-            min="0.01"
-            step="0.01"
-            type="number"
-            name="currentDose"
-            defaultValue={profile?.current_dose ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
-            placeholder="0.50"
+        <div className="space-y-2 sm:col-span-1">
+          <label className="space-y-2">
+            <span className="text-sm font-medium text-slate-700">Current dose (mg)</span>
+            <input
+              required
+              min="0.01"
+              step="0.01"
+              type="number"
+              name="currentDose"
+              value={currentDose}
+              onChange={(event) => setCurrentDose(event.target.value)}
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
+              placeholder="0.50"
+            />
+          </label>
+          <ApproximateDiazepamHelper
+            medication={benzoName}
+            dose={currentDose ? Number(currentDose) : null}
+            compact
           />
-        </label>
+        </div>
         <label className="space-y-2 sm:col-span-1">
           <span className="text-sm font-medium text-slate-700">Taper start date</span>
           <input
