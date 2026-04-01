@@ -1,10 +1,12 @@
 import { MetricChart } from "@/components/charts/metric-chart";
+import { DoctorVisitSummaryPanel } from "@/components/doctor-visit/doctor-visit-summary-panel";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ExportLogsButton } from "@/components/export/export-logs-button";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
-import { getDashboardData } from "@/lib/data";
 import { requireUser } from "@/lib/auth";
+import { getDashboardData } from "@/lib/data";
+import { buildDoctorVisitSummary } from "@/lib/doctor-visit-summary";
 import {
   cn,
   describeRelativeDate,
@@ -24,6 +26,7 @@ export default async function DashboardPage() {
     return null;
   }
 
+  const doctorVisitSummary = buildDoctorVisitSummary(profile, logs);
   const chartData = logs.slice(-21);
   const chartStart = chartData[0]?.log_date;
   const reductionMarkers = events
@@ -124,6 +127,8 @@ export default async function DashboardPage() {
           cue={sleepCue}
         />
       </div>
+
+      <DoctorVisitSummaryPanel summary={doctorVisitSummary} />
 
       {insights.length ? (
         <Card className="rounded-[2rem] p-6 sm:p-7">
