@@ -233,6 +233,12 @@ function computeCheckInStreak(logs: DailyLog[]) {
     return 0;
   }
 
+  const latestLog = logs.at(-1);
+
+  if (!latestLog || dateDiffInDays(todayIso(), latestLog.log_date) > 1) {
+    return 0;
+  }
+
   let streak = 1;
 
   for (let index = logs.length - 1; index > 0; index -= 1) {

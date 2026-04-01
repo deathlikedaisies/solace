@@ -44,6 +44,7 @@ export default async function LogPage({ searchParams }: LogPageProps) {
         profileDose={profile.current_dose}
         initialDate={initialDate}
         initialLog={initialLog}
+        logs={logs}
         today={today}
       />
 

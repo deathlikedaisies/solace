@@ -62,6 +62,14 @@ export const symptomLabels: Record<SymptomValue, string> = {
   "Seizure-like symptoms": "Seizure-like sensations",
 };
 
+export function getSymptomLabel(symptom: string) {
+  if (symptom in symptomLabels) {
+    return symptomLabels[symptom as SymptomValue];
+  }
+
+  return symptom;
+}
+
 export const symptomGroups: Array<{
   title: string;
   symptoms: SymptomValue[];

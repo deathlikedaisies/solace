@@ -75,8 +75,9 @@ export default async function DashboardPage() {
   const streakLine =
     streak > 0
       ? `${streak} day${streak === 1 ? "" : "s"} in a row`
-      : "The next check-in starts your run of days.";
-
+      : latestLog
+        ? "Pick up again when you are ready."
+        : "The next check-in starts your run of days.";
   return (
     <div className="space-y-8">
       <Card className="rounded-[2rem] p-6 sm:p-8">

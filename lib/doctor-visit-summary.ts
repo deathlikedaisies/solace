@@ -1,6 +1,13 @@
 import type { Database } from "@/lib/database.types";
-import { symptomLabels } from "@/lib/constants";
-import { formatDate, formatDose, formatHours } from "@/lib/utils";
+import { getSymptomLabel } from "@/lib/constants";
+import {
+  formatCompactDate,
+  formatDate,
+  formatDose,
+  formatHours,
+  shiftIsoDate,
+  todayIso,
+} from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
@@ -29,12 +36,15 @@ export function buildDoctorVisitSummary(
   profile: Profile,
   logs: DailyLog[],
 ): DoctorVisitSummary {
-  const recentLogs = logs.slice(-14);
-  const recentWindowCount = recentLogs.length || Math.min(logs.length, 14) || 14;
-  const recentWindowLabel = `Last ${recentWindowCount} day${recentWindowCount === 1 ? "" : "s"}`;
+  const windowEnd = logs.at(-1)?.log_date ?? todayIso();
+  const windowStart = shiftIsoDate(windowEnd, -13);
+  const recentLogs = logs.filter(
+    (log) => log.log_date >= windowStart && log.log_date <= windowEnd,
+  );
+  const recentWindowLabel = describeWindow(windowStart, windowEnd);
   const recentSleepAverage = average(recentLogs.map((log) => log.sleep_hours));
   const symptomDays = recentLogs.filter((log) => log.symptoms.length > 0).length;
-  const symptomTrend = describeSymptomTrend(logs);
+  const symptomTrend = describeSymptomTrend(recentLogs, logs);
   const topSymptoms = getTopSymptoms(recentLogs);
   const recentNotes = logs
     .filter((log) => Boolean(log.notes?.trim()))
@@ -45,7 +55,7 @@ export function buildDoctorVisitSummary(
   const doctorLines = buildDoctorLines({
     profile,
     recentLogs,
-    recentWindowCount,
+    recentWindowLabel,
     recentSleepAverage,
     symptomDays,
     symptomTrend,
@@ -64,13 +74,13 @@ export function buildDoctorVisitSummary(
       ],
     },
     {
-      title: `Recent pattern (${recentWindowLabel.toLowerCase()})`,
+      title: `Recent pattern (${recentWindowLabel})`,
       lines: [
         recentLogs.length
           ? `Average sleep: ${formatHours(recentSleepAverage)}`
           : "Average sleep: Still taking shape from your recent entries.",
         recentLogs.length
-          ? `Symptoms showed up on ${symptomDays} of the last ${recentLogs.length} days.`
+          ? `Symptoms showed up on ${symptomDays} of the ${recentLogs.length} day${recentLogs.length === 1 ? "" : "s"} you logged in this stretch.`
           : "Symptoms: Still taking shape from your recent entries.",
         `Overall pattern: ${symptomTrend}.`,
       ],
@@ -83,7 +93,7 @@ export function buildDoctorVisitSummary(
     },
     {
       title: "Recent notes",
-      lines: recentNotes.length ? recentNotes : ["No recent notes yet."] ,
+      lines: recentNotes.length ? recentNotes : ["No recent notes yet."],
     },
     {
       title: "How this has been feeling lately",
@@ -102,7 +112,11 @@ export function buildDoctorVisitSummary(
   const text = [
     "Prepare for appointment",
     "",
-    ...sections.flatMap((section) => [section.title, ...section.lines.map((line) => `- ${line}`), ""]),
+    ...sections.flatMap((section) => [
+      section.title,
+      ...section.lines.map((line) => `- ${line}`),
+      "",
+    ]),
     disclaimer,
   ]
     .join("\n")
@@ -126,9 +140,15 @@ function average(values: number[]) {
   );
 }
 
-function describeSymptomTrend(logs: DailyLog[]) {
-  const recent = logs.slice(-7);
-  const earlier = logs.slice(-14, -7);
+function describeWindow(start: string, end: string) {
+  return start === end
+    ? formatCompactDate(end)
+    : `${formatCompactDate(start)} to ${formatCompactDate(end)}`;
+}
+
+function describeSymptomTrend(recentLogs: DailyLog[], allLogs: DailyLog[]) {
+  const recent = recentLogs.slice(-7);
+  const earlier = allLogs.filter((log) => log.log_date < (recent[0]?.log_date ?? "")).slice(-7);
 
   if (recent.length < 3 || earlier.length < 3) {
     return "still taking shape in the recent entries";
@@ -161,14 +181,6 @@ function getTopSymptoms(logs: DailyLog[]) {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, 7)
     .map(([symptom, count]) => `${getSymptomLabel(symptom)} (${count} day${count === 1 ? "" : "s"})`);
-}
-
-function getSymptomLabel(symptom: string) {
-  if (symptom in symptomLabels) {
-    return symptomLabels[symptom as keyof typeof symptomLabels];
-  }
-
-  return symptom;
 }
 
 function compactNote(note: string) {
@@ -210,7 +222,7 @@ function buildImpactLines(logs: DailyLog[], sleepAverage: number) {
 function buildDoctorLines({
   profile,
   recentLogs,
-  recentWindowCount,
+  recentWindowLabel,
   recentSleepAverage,
   symptomDays,
   symptomTrend,
@@ -220,7 +232,7 @@ function buildDoctorLines({
 }: {
   profile: Profile;
   recentLogs: DailyLog[];
-  recentWindowCount: number;
+  recentWindowLabel: string;
   recentSleepAverage: number;
   symptomDays: number;
   symptomTrend: string;
@@ -234,7 +246,7 @@ function buildDoctorLines({
 
   if (recentLogs.length) {
     lines.push(
-      `Over the last ${recentWindowCount} days, I've averaged ${formatHours(recentSleepAverage)} of sleep, and symptoms have shown up on ${symptomDays} of those days.`,
+      `Over ${recentWindowLabel}, I've averaged ${formatHours(recentSleepAverage)} of sleep, and symptoms have shown up on ${symptomDays} of the ${recentLogs.length} day${recentLogs.length === 1 ? "" : "s"} I logged.`,
     );
     lines.push(`Overall, things have felt ${symptomTrend}.`);
   } else {
@@ -242,7 +254,9 @@ function buildDoctorLines({
   }
 
   if (topSymptoms.length) {
-    lines.push(`The symptoms I've noticed most often are ${naturalList(topSymptoms.map(stripCountSuffix))}.`);
+    lines.push(
+      `The symptoms I've noticed most often are ${naturalList(topSymptoms.map(stripCountSuffix))}.`,
+    );
   } else {
     lines.push("I haven't logged a clear symptom pattern yet, but I wanted to share what I have so far.");
   }

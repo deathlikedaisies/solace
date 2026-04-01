@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { ButtonLink, Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { saveDailyCheckInAction } from "@/lib/actions/logs";
@@ -22,25 +22,46 @@ type DailyCheckInFormProps = {
   profileDose: number;
   initialDate: string;
   initialLog: DailyLog | null;
+  logs: DailyLog[];
   today: string;
+};
+
+type DraftValues = {
+  dose: number;
+  anxiety: number;
+  mood: number;
+  sleepQuality: number;
+  sleepHours: number;
+  symptoms: string[];
+  notes: string;
 };
 
 export function DailyCheckInForm({
   profileDose,
   initialDate,
   initialLog,
+  logs,
   today,
 }: DailyCheckInFormProps) {
   const [state, formAction, pending] = useActionState(
     saveDailyCheckInAction,
     initialFormState,
   );
+  const logsByDate = useMemo(
+    () => Object.fromEntries(logs.map((log) => [log.log_date, log])),
+    [logs],
+  );
+  const initialDraft = buildDraft(initialLog, profileDose);
   const [logDate, setLogDate] = useState(initialLog?.log_date ?? initialDate);
-  const [anxiety, setAnxiety] = useState(initialLog?.anxiety ?? 4);
-  const [mood, setMood] = useState(initialLog?.mood ?? 5);
-  const [sleepQuality, setSleepQuality] = useState(initialLog?.sleep_quality ?? 5);
-  const [symptoms, setSymptoms] = useState<string[]>(initialLog?.symptoms ?? []);
+  const [dose, setDose] = useState(initialDraft.dose);
+  const [anxiety, setAnxiety] = useState(initialDraft.anxiety);
+  const [mood, setMood] = useState(initialDraft.mood);
+  const [sleepQuality, setSleepQuality] = useState(initialDraft.sleepQuality);
+  const [sleepHours, setSleepHours] = useState(initialDraft.sleepHours);
+  const [symptoms, setSymptoms] = useState<string[]>(initialDraft.symptoms);
+  const [notes, setNotes] = useState(initialDraft.notes);
 
+  const selectedLog = logsByDate[logDate] ?? null;
   const yesterday = shiftIsoDate(today, -1);
   const isToday = logDate === today;
   const relativeDate = describeRelativeDate(logDate, today);
@@ -48,9 +69,24 @@ export function DailyCheckInForm({
     anxiety >= 9 ||
     mood <= 2 ||
     sleepQuality <= 2 ||
+    sleepHours <= 3 ||
     symptoms.some((symptom) =>
       severeSymptoms.includes(symptom as (typeof severeSymptoms)[number]),
     );
+
+  function loadDate(nextDate: string) {
+    const nextLog = logsByDate[nextDate] ?? null;
+    const nextDraft = buildDraft(nextLog, profileDose);
+
+    setLogDate(nextDate);
+    setDose(nextDraft.dose);
+    setAnxiety(nextDraft.anxiety);
+    setMood(nextDraft.mood);
+    setSleepQuality(nextDraft.sleepQuality);
+    setSleepHours(nextDraft.sleepHours);
+    setSymptoms(nextDraft.symptoms);
+    setNotes(nextDraft.notes);
+  }
 
   if (state.status === "success") {
     return (
@@ -85,7 +121,7 @@ export function DailyCheckInForm({
             A brief note for {relativeDate}.
           </p>
         </div>
-        {initialLog ? (
+        {selectedLog ? (
           <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-slate-700">
             Updating this day&apos;s note
           </span>
@@ -99,7 +135,7 @@ export function DailyCheckInForm({
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => setLogDate(today)}
+              onClick={() => loadDate(today)}
               className={cn(
                 "focus-ring rounded-full border px-4 py-2 text-sm font-medium",
                 isToday
@@ -111,7 +147,7 @@ export function DailyCheckInForm({
             </button>
             <button
               type="button"
-              onClick={() => setLogDate(yesterday)}
+              onClick={() => loadDate(yesterday)}
               className={cn(
                 "focus-ring rounded-full border px-4 py-2 text-sm font-medium",
                 logDate === yesterday
@@ -123,7 +159,7 @@ export function DailyCheckInForm({
             </button>
           </div>
           <p className="text-xs leading-5 text-slate-500">
-            Missed a recent day? Switch the date and save it here.
+            Missed a recent day? Switching dates loads that day&apos;s note if one is already there.
           </p>
         </div>
 
@@ -135,7 +171,7 @@ export function DailyCheckInForm({
               type="date"
               name="logDate"
               value={logDate}
-              onChange={(event) => setLogDate(event.target.value)}
+              onChange={(event) => loadDate(event.target.value)}
               className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
@@ -147,7 +183,8 @@ export function DailyCheckInForm({
               step="0.01"
               type="number"
               name="dose"
-              defaultValue={initialLog?.dose ?? profileDose}
+              value={dose}
+              onChange={(event) => setDose(Number(event.target.value))}
               className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
@@ -173,7 +210,8 @@ export function DailyCheckInForm({
               step="0.5"
               type="number"
               name="sleepHours"
-              defaultValue={initialLog?.sleep_hours ?? 7}
+              value={sleepHours}
+              onChange={(event) => setSleepHours(Number(event.target.value))}
               className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
             />
           </label>
@@ -226,7 +264,8 @@ export function DailyCheckInForm({
           <textarea
             rows={4}
             name="notes"
-            defaultValue={initialLog?.notes ?? ""}
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
             className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/92 px-4 py-3 text-sm text-slate-900"
             placeholder="Anything you want to remember later."
           />
@@ -280,4 +319,16 @@ function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
       />
     </label>
   );
+}
+
+function buildDraft(log: DailyLog | null, profileDose: number): DraftValues {
+  return {
+    dose: log?.dose ?? profileDose,
+    anxiety: log?.anxiety ?? 4,
+    mood: log?.mood ?? 5,
+    sleepQuality: log?.sleep_quality ?? 5,
+    sleepHours: log?.sleep_hours ?? 7,
+    symptoms: log?.symptoms ?? [],
+    notes: log?.notes ?? "",
+  };
 }

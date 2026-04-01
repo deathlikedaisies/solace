@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Database } from "@/lib/database.types";
+import { getSymptomLabel } from "@/lib/constants";
 import { formatDate, formatDose, formatHours } from "@/lib/utils";
 import { EmptyState } from "@/components/feedback/empty-state";
 
@@ -112,7 +113,7 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
                     key={`${log.id}-${symptom}`}
                     className="rounded-full border border-primary-200/60 bg-primary-50/65 px-2.5 py-1 text-xs text-slate-600"
                   >
-                    {symptom}
+                    {getSymptomLabel(symptom)}
                   </span>
                 ))}
               </div>

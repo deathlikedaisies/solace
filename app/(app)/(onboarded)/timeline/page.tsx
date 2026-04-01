@@ -7,8 +7,8 @@ import { getTimelineData } from "@/lib/data";
 export default async function TimelinePage() {
   const user = await requireUser("/timeline");
   const items = await getTimelineData(user.id);
-  const reductionEvents = items.filter(
-    (item) => item.kind === "event" && item.eventType === "reduction",
+  const doseChanges = items.filter(
+    (item) => item.kind === "event" && item.eventType !== "initial",
   );
   const holdEvents = items.filter((item) => item.kind === "hold");
 
@@ -32,7 +32,7 @@ export default async function TimelinePage() {
           </div>
           {items.length ? (
             <p className="text-sm text-slate-500">
-              {reductionEvents.length} dose change{reductionEvents.length === 1 ? "" : "s"}
+              {doseChanges.length} dose change{doseChanges.length === 1 ? "" : "s"}
               {holdEvents.length
                 ? ` and ${holdEvents.length} steadier stretch${holdEvents.length === 1 ? "" : "es"}`
                 : ""} shown here.
