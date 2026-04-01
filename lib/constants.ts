@@ -11,6 +11,7 @@ export const symptomOptions = [
   "Sensory sensitivity",
   "Sound sensitivity",
   "Visual sensitivity",
+  "Touch sensitivity",
   "Tremor",
   "Sweating",
   "Brain fog",
@@ -44,6 +45,7 @@ export const symptomLabels: Record<SymptomValue, string> = {
   "Sensory sensitivity": "Sensitive to light or sound",
   "Sound sensitivity": "Noise sensitivity",
   "Visual sensitivity": "Light sensitivity",
+  "Touch sensitivity": "Sensitive to touch",
   Tremor: "Tremor",
   Sweating: "Sweating",
   "Brain fog": "Brain fog",
@@ -108,6 +110,7 @@ export const symptomGroups: Array<{
     symptoms: [
       "Visual sensitivity",
       "Sound sensitivity",
+      "Touch sensitivity",
       "Blurred vision",
       "Tinnitus",
     ],
