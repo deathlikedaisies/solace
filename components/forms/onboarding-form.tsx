@@ -7,7 +7,6 @@ import type { Database } from "@/lib/database.types";
 import { benzodiazepineOptions, isKnownBenzodiazepine } from "@/lib/benzodiazepines";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ApproximateDoseReferenceTool } from "@/components/dose/approximate-dose-reference-tool";
 import { cn } from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -24,108 +23,109 @@ export function OnboardingForm({ profile }: { profile: Profile | null }) {
       ? profile.benzo_name
       : otherMedication,
   );
-  const [currentDose, setCurrentDose] = useState(
-    profile?.current_dose ? String(profile.current_dose) : "",
-  );
+  const currentDose = profile?.current_dose ?? "";
+  const startingDose = profile?.starting_dose ?? profile?.current_dose ?? "";
 
   return (
     <Card className="rounded-[2rem] p-6 sm:p-8">
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-          Set up your taper snapshot
+          Start with a few basics
         </h2>
-        <p className="max-w-2xl text-sm leading-6 text-slate-600">
-          Add where your taper started and where you are now so the charts and
-          timeline can show the bigger picture instead of only today.
+        <p className="max-w-2xl text-base leading-7 text-slate-700">
+          This gives Solace a starting point. You can add the rest as you go.
         </p>
       </div>
 
-      <form action={formAction} className="mt-6 grid gap-4 sm:grid-cols-2">
-        <label className="space-y-2 sm:col-span-1">
-          <span className="text-sm font-medium text-slate-700">Medication</span>
-          <select
-            required
-            name="benzoName"
-            value={benzoName}
-            onChange={(event) => setBenzoName(event.target.value)}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
-          >
-            {benzodiazepineOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="space-y-2 sm:col-span-1">
-          <span className="text-sm font-medium text-slate-700">
-            Taper starting dose (mg)
-          </span>
-          <input
-            required
-            min="0.01"
-            step="0.01"
-            type="number"
-            name="startingDose"
-            defaultValue={profile?.starting_dose ?? profile?.current_dose ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
-            placeholder="10"
-          />
-        </label>
-        <div className="space-y-2 sm:col-span-1">
+      <form action={formAction} className="mt-8 space-y-6">
+        <section className="space-y-3 rounded-[1.75rem] bg-white/75 p-5">
+          <p className="text-sm font-medium text-slate-500">Step 1</p>
           <label className="space-y-2">
-            <span className="text-sm font-medium text-slate-700">Current dose (mg)</span>
+            <span className="text-base font-medium text-slate-800">Medication</span>
+            <select
+              required
+              name="benzoName"
+              value={benzoName}
+              onChange={(event) => setBenzoName(event.target.value)}
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-base text-slate-900"
+            >
+              {benzodiazepineOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+        </section>
+
+        <section className="space-y-3 rounded-[1.75rem] bg-white/75 p-5">
+          <p className="text-sm font-medium text-slate-500">Step 2</p>
+          <label className="space-y-2">
+            <span className="text-base font-medium text-slate-800">Current dose (mg)</span>
             <input
               required
               min="0.01"
               step="0.01"
               type="number"
               name="currentDose"
-              value={currentDose}
-              onChange={(event) => setCurrentDose(event.target.value)}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
+              defaultValue={currentDose}
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-base text-slate-900"
               placeholder="0.50"
             />
           </label>
-          <ApproximateDoseReferenceTool
-            defaultMedication={benzoName}
-            defaultDose={currentDose}
-          />
-        </div>
-        <label className="space-y-2 sm:col-span-1">
-          <span className="text-sm font-medium text-slate-700">Taper start date</span>
-          <input
-            required
-            type="date"
-            name="taperStartDate"
-            defaultValue={profile?.taper_start_date ?? ""}
-            className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900"
-          />
-        </label>
-        <label className="space-y-2 sm:col-span-2">
+        </section>
+
+        <section className="space-y-4 rounded-[1.75rem] bg-white/75 p-5">
+          <p className="text-sm font-medium text-slate-500">Step 3</p>
+          <label className="space-y-2">
+            <span className="text-base font-medium text-slate-800">When did your taper begin?</span>
+            <input
+              required
+              type="date"
+              name="taperStartDate"
+              defaultValue={profile?.taper_start_date ?? ""}
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-base text-slate-900"
+            />
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-medium text-slate-700">Dose when taper began (mg)</span>
+            <input
+              required
+              min="0.01"
+              step="0.01"
+              type="number"
+              name="startingDose"
+              defaultValue={startingDose}
+              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 text-base text-slate-900"
+              placeholder="10"
+            />
+          </label>
+        </section>
+
+        <label className="space-y-2 block">
           <span className="text-sm font-medium text-slate-700">Notes (optional)</span>
           <textarea
             name="notes"
-            rows={5}
+            rows={4}
             defaultValue={profile?.notes ?? ""}
-            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900"
-            placeholder="Anything you want to remember about your taper context."
+            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/90 px-4 py-3 text-base text-slate-900"
+            placeholder="Anything you want to remember about where things stand right now."
           />
         </label>
+
         <div
           className={cn(
-            "rounded-2xl px-4 py-3 text-sm sm:col-span-2",
+            "rounded-2xl px-4 py-3 text-sm leading-6",
             state.status === "error" && "bg-danger-100 text-danger-500",
             state.status === "idle" && "hidden",
           )}
         >
           {state.message}
         </div>
-        <div className="sm:col-span-2">
-          <Button type="submit" disabled={pending}>
-            {pending ? "Saving..." : "Save and continue"}
-          </Button>
-        </div>
+
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving..." : "Save and continue"}
+        </Button>
       </form>
     </Card>
   );

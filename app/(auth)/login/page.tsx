@@ -33,9 +33,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <AuthForm
             title="Log in"
             description="Use your email and password to open your private space."
+            reassuranceText="You'll return to your journal after logging in."
             submitLabel="Log in"
             action={signInAction}
             next={params.next}
+            forgotPasswordHref="/forgot-password"
           />
         </div>
       </div>

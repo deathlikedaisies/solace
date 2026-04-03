@@ -8,9 +8,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
 import { getDashboardData } from "@/lib/data";
 import { buildDoctorVisitSummary } from "@/lib/doctor-visit-summary";
-import {
-  cn,
-  describeRelativeDate,
+import {  describeRelativeDate,
   formatCompactDate,
   formatDate,
   formatDose,
@@ -36,7 +34,6 @@ export default async function DashboardPage() {
     .map((event) => ({ date: event.event_date, label: "Dose change" }));
   const startingDose = profile.starting_dose ?? profile.current_dose;
   const doseChange = Number((startingDose - profile.current_dose).toFixed(2));
-  const latestSymptoms = latestLog?.symptoms.length ?? 0;
   const previousWeek = logs.slice(-14, -7);
   const previousSymptomAverage = average(previousWeek.map((log) => log.symptoms.length));
   const previousAnxietyAverage = average(previousWeek.map((log) => log.anxiety));
@@ -56,105 +53,70 @@ export default async function DashboardPage() {
     same: "Holding steady",
     higher: "A little brighter lately",
   });
-  const todayCue = todayLog
-    ? "You've checked in today."
-    : latestLog
-      ? `Last entry: ${describeRelativeDate(latestLog.log_date)}.`
-      : "No check-in yet.";
+  const sleepCue = getSleepCue(averages.sleepHours);
   const checkInValue = todayLog
     ? "Today"
     : latestLog
       ? formatRelativeDateLabel(latestLog.log_date)
       : "Open";
-  const changeCue = doseChange > 0 ? `Down from ${formatDose(startingDose)}` : "No change today";
-  const sleepCue = getSleepCue(averages.sleepHours);
-  const symptomValue = todayLog
-    ? `${todayLog.symptoms.length} today`
+  const statusLine = todayLog
+    ? "You've checked in today."
     : latestLog
-      ? `${latestSymptoms} last time`
-      : "No entries";
-  const streakLine =
+      ? `Last entry: ${describeRelativeDate(latestLog.log_date)}.`
+      : "Start with today, or add a recent day you missed.";
+  const changeCue = doseChange > 0 ? `Down from ${formatDose(startingDose)}` : "No change today";
+  const continuityLine =
     streak > 0
       ? `${streak} day${streak === 1 ? "" : "s"} in a row`
       : latestLog
         ? "Pick up again when you are ready."
-        : "The next check-in starts your run of days.";
+        : "The next check-in starts your first run of days.";
+  const topInsight = insights[0]?.text ?? continuityLine;
 
   return (
-    <div className="space-y-8">
-      <Card className="rounded-[2rem] p-6 sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
-              Check-in overview
-            </p>
-            <h2 className="text-[1.9rem] font-semibold tracking-tight text-slate-900 sm:text-[2.1rem]">
-              {todayLog ? "Today is already noted." : "A quick look at where things stand."}
-            </h2>
-            <p className="text-sm leading-6 text-slate-600">
-              {todayLog
-                ? "You've checked in today."
-                : latestLog
-                  ? `Last entry: ${describeRelativeDate(latestLog.log_date)}.`
-                  : "Start with today, or add a recent day you missed."}
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <ButtonLink href="/log">
-              {todayLog ? "Update today's note" : "Log today"}
-            </ButtonLink>
-            <ButtonLink href="/journal" variant="secondary">
-              Journal
-            </ButtonLink>
-            <ExportLogsButton disabled={!logs.length} />
-          </div>
-        </div>
-      </Card>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <OverviewCard label="Check-in" value={checkInValue} cue={todayCue} />
-        <OverviewCard
-          label="Current dose"
-          value={formatDose(profile.current_dose)}
-          cue={changeCue}
-          extra={
-            <ButtonLink href="/log" variant="secondary" className="mt-4 w-full sm:w-auto">
-              View approximate equivalence
-            </ButtonLink>
-          }
-        />
-        <OverviewCard
-          label="Symptoms recently"
-          value={symptomValue}
-          cue={symptomCue}
-          tone={symptomCue === "A bit heavier lately" ? "soft-alert" : "default"}
-        />
-        <OverviewCard
-          label="Recent sleep"
-          value={formatHours(averages.sleepHours)}
-          cue={sleepCue}
-        />
-      </div>
-
-      <DoctorVisitSummaryPanel summary={doctorVisitSummary} />
-
-      {insights.length ? (
-        <Card className="rounded-[2rem] p-6 sm:p-7">
-          <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
-            A few recent notes
-          </p>
-          <div className="mt-4 space-y-3">
-            {insights.map((insight) => (
-              <div
-                key={insight.id}
-                className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 text-sm leading-6 text-slate-700"
-              >
-                {insight.text}
-              </div>
-            ))}
+    <div className="space-y-10">
+      <section className="space-y-4">
+        <Card className="rounded-[2rem] p-6 sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-3">
+              <h2 className="text-[2rem] font-semibold tracking-tight text-slate-900 sm:text-[2.2rem]">
+                {todayLog ? "Today is already noted." : "A quick look at where things stand."}
+              </h2>
+              <p className="max-w-2xl text-base leading-7 text-slate-700">{statusLine}</p>
+              <p className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 text-sm leading-6 text-slate-700">
+                {topInsight}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ButtonLink href="/log">
+                {todayLog ? "Update today's note" : "Log today"}
+              </ButtonLink>
+              <ButtonLink href="/journal" variant="secondary">
+                Open journal
+              </ButtonLink>
+              <ExportLogsButton disabled={!logs.length} />
+            </div>
           </div>
         </Card>
-      ) : null}
+
+        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <SummaryCard
+            title="Current dose"
+            value={formatDose(profile.current_dose)}
+            detail={`${profile.benzo_name} • ${changeCue}`}
+            extra={
+              <ButtonLink href="/log" variant="secondary" className="mt-4 w-full sm:w-auto">
+                View approximate equivalence
+              </ButtonLink>
+            }
+          />
+          <SummaryCard
+            title={todayLog ? "Today" : "Last entry"}
+            value={checkInValue}
+            detail={todayLog ? continuityLine : statusLine}
+          />
+        </div>
+      </section>
 
       {!logs.length ? (
         <EmptyState
@@ -167,15 +129,13 @@ export default async function DashboardPage() {
       ) : (
         <>
           <section className="space-y-5">
-            <div className="flex items-end justify-between gap-4 px-1">
-              <div>
-                <h3 className="text-[1.35rem] font-semibold tracking-tight text-slate-900">
-                  Recent patterns
-                </h3>
-                <p className="mt-1 text-sm text-slate-600">
-                  Just enough to help you notice what has been steady and what has shifted.
-                </p>
-              </div>
+            <div className="space-y-1 px-1">
+              <h3 className="text-[1.4rem] font-semibold tracking-tight text-slate-900">
+                Recent patterns
+              </h3>
+              <p className="text-sm leading-6 text-slate-600">
+                A simple view of what has been steady and what has shifted.
+              </p>
             </div>
             <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
               <MetricChart
@@ -216,24 +176,21 @@ export default async function DashboardPage() {
             </div>
           </section>
 
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
             <Card className="rounded-[2rem] p-6 sm:p-7">
-              <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
-                Last note
-              </p>
-              <h3 className="mt-2 text-[1.5rem] font-semibold tracking-tight text-slate-900">
+              <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
                 Most recent day
               </h3>
               {latestLog ? (
-                <div className="mt-6 space-y-3 text-sm text-slate-700">
-                  <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
+                <div className="mt-5 space-y-3 text-base leading-7 text-slate-700">
+                  <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-slate-900">
                     {formatDate(latestLog.log_date)}
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <DetailPill>Dose {formatDose(latestLog.dose)}</DetailPill>
-                    <DetailPill>Anxiety {latestLog.anxiety}/10</DetailPill>
-                    <DetailPill>Mood {latestLog.mood}/10</DetailPill>
-                    <DetailPill>Sleep {formatHours(latestLog.sleep_hours)}</DetailPill>
+                  <div className="rounded-[1.5rem] bg-white/80 px-4 py-4">
+                    <p><span className="font-medium text-slate-900">Dose</span> {formatDose(latestLog.dose)}</p>
+                    <p><span className="font-medium text-slate-900">Anxiety</span> {latestLog.anxiety}/10</p>
+                    <p><span className="font-medium text-slate-900">Mood</span> {latestLog.mood}/10</p>
+                    <p><span className="font-medium text-slate-900">Sleep</span> {formatHours(latestLog.sleep_hours)}</p>
                   </div>
                   <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 leading-6 text-slate-700">
                     Recent averages: anxiety {averages.anxiety}/10, mood {averages.mood}/10, sleep {formatHours(averages.sleepHours)}, symptoms {averages.symptomLoad}/day.
@@ -247,74 +204,56 @@ export default async function DashboardPage() {
             </Card>
 
             <Card className="rounded-[2rem] p-6 sm:p-7">
-              <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
-                Dose path
-              </p>
-              <h3 className="mt-2 text-[1.5rem] font-semibold tracking-tight text-slate-900">
+              <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
                 Taper snapshot
               </h3>
-              <div className="mt-6 space-y-3 text-sm text-slate-700">
+              <div className="mt-5 space-y-3 text-base leading-7 text-slate-700">
                 <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 text-slate-700">
-                  {streakLine}
+                  {continuityLine}
                 </div>
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  {profile.benzo_name}
+                  <span className="font-medium text-slate-900">Medication</span> {profile.benzo_name}
                 </div>
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  Started from {formatDose(startingDose)}
+                  <span className="font-medium text-slate-900">Started from</span> {formatDose(startingDose)}
                 </div>
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  Now at {formatDose(profile.current_dose)}
+                  <span className="font-medium text-slate-900">Now at</span> {formatDose(profile.current_dose)}
                 </div>
                 <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  Taper start {formatCompactDate(profile.taper_start_date)}
+                  <span className="font-medium text-slate-900">Taper start</span> {formatCompactDate(profile.taper_start_date)}
                 </div>
               </div>
             </Card>
-          </div>
+          </section>
+
+          <DoctorVisitSummaryPanel summary={doctorVisitSummary} />
         </>
       )}
     </div>
   );
 }
 
-function OverviewCard({
-  label,
+function SummaryCard({
+  title,
   value,
-  cue,
-  tone = "default",
+  detail,
   extra,
 }: {
-  label: string;
+  title: string;
   value: string;
-  cue: string;
-  tone?: "default" | "soft-alert";
+  detail: string;
   extra?: ReactNode;
 }) {
   return (
     <Card className="rounded-[1.75rem] p-5 sm:p-6">
-      <p className="text-sm text-slate-600">{label}</p>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
+      <p className="text-sm font-medium text-slate-600">{title}</p>
+      <p className="mt-3 text-[1.7rem] font-semibold tracking-tight text-slate-900">
         {value}
       </p>
-      <p
-        className={cn(
-          "mt-2 text-sm",
-          tone === "soft-alert" ? "text-danger-500" : "text-slate-500",
-        )}
-      >
-        {cue}
-      </p>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{detail}</p>
       {extra}
     </Card>
-  );
-}
-
-function DetailPill({ children }: { children: ReactNode }) {
-  return (
-    <div className="rounded-[1.25rem] bg-warm-100/90 px-4 py-3 text-sm text-slate-700">
-      {children}
-    </div>
   );
 }
 

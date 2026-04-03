@@ -13,30 +13,26 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
       <Card className="rounded-[2rem] p-6 sm:p-8">
-        <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
-          Onboarding
-        </p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
-          Start with the fuller picture.
+        <h2 className="text-3xl font-semibold tracking-tight text-slate-900">
+          Start with the essentials.
         </h2>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          Solace works best when it knows the medication you are tracking, the dose you
-          started tapering from, and the dose you are on now.
+        <p className="mt-3 text-base leading-7 text-slate-700">
+          A few basics are enough to get your notes, charts, and timeline started.
         </p>
-        <div className="mt-6 space-y-3 text-sm text-slate-700">
+        <div className="mt-6 space-y-3 text-base leading-7 text-slate-700">
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-            Medication, taper starting dose, and current dose
+            Your medication
           </div>
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-            A quiet diazepam reference, shown as approximate only when available
+            The dose you are on now
           </div>
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-            Taper start date for your first timeline marker
+            When your taper began, and the dose you began from
           </div>
           <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-            Optional notes for context if you are already partway through
+            Any notes you want to keep for context
           </div>
         </div>
       </Card>

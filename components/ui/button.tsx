@@ -25,7 +25,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "focus-ring inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-55",
+        "focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-55",
         buttonVariants[variant],
         className,
       )}
@@ -50,7 +50,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "focus-ring inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium shadow-sm",
+        "focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-medium shadow-sm",
         buttonVariants[variant],
         className,
       )}

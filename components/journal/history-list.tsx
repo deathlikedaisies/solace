@@ -37,7 +37,7 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div className="grid gap-4 rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)] sm:grid-cols-2 lg:grid-cols-[1.15fr_repeat(2,minmax(0,1fr))_auto] lg:items-end">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
@@ -77,53 +77,47 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
         </button>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-7">
         {filtered.length ? (
-          filtered.map((log) => (
-            <article
-              key={log.id}
-              className="rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)]"
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-xs font-medium tracking-[0.22em] text-slate-500 uppercase">
+          filtered.map((log) => {
+            const symptomLine = log.symptoms.length
+              ? log.symptoms.map((symptom) => getSymptomLabel(symptom)).join(", ")
+              : "None marked";
+
+            return (
+              <article
+                key={log.id}
+                className="rounded-[1.75rem] border border-white/70 bg-white/80 p-5 shadow-[0_18px_50px_rgba(54,66,82,0.08)]"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <h3 className="text-lg font-semibold tracking-tight text-slate-900">
                     {formatDate(log.log_date)}
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-slate-700">
-                    Dose {formatDose(log.dose)}. Anxiety {log.anxiety}/10. Mood {log.mood}/10. Sleep {formatHours(log.sleep_hours)}.
-                  </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {log.symptoms.length
-                      ? `${log.symptoms.length} symptom${log.symptoms.length === 1 ? "" : "s"} noted`
-                      : "No symptoms marked"}
-                  </p>
+                  </h3>
+                  {log.severe_flag ? (
+                    <span className="rounded-full bg-danger-100 px-3 py-1 text-xs font-medium text-danger-500">
+                      Harder day
+                    </span>
+                  ) : null}
                 </div>
-                {log.severe_flag ? (
-                  <span className="rounded-full bg-danger-100 px-3 py-1 text-xs font-medium text-danger-500">
-                    Harder day
-                  </span>
+                <div className="mt-4 space-y-1 text-base leading-7 text-slate-700">
+                  <p><span className="font-medium text-slate-900">Dose</span> {formatDose(log.dose)}</p>
+                  <p><span className="font-medium text-slate-900">Anxiety</span> {log.anxiety} / 10</p>
+                  <p><span className="font-medium text-slate-900">Mood</span> {log.mood} / 10</p>
+                  <p><span className="font-medium text-slate-900">Sleep</span> {formatHours(log.sleep_hours)}</p>
+                  <p><span className="font-medium text-slate-900">Sleep quality</span> {log.sleep_quality} / 10</p>
+                </div>
+                <div className="mt-5 rounded-[1.5rem] bg-primary-50/90 px-4 py-3 text-sm leading-6 text-slate-700">
+                  <span className="font-medium text-slate-900">Symptoms:</span> {symptomLine}
+                </div>
+                {log.notes ? (
+                  <div className="mt-4 rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm leading-7 text-slate-700">
+                    <p className="font-medium text-slate-900">Note</p>
+                    <p className="mt-1">{log.notes}</p>
+                  </div>
                 ) : null}
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <span className="rounded-full bg-primary-100/70 px-2.5 py-1 text-xs text-slate-700">
-                  Sleep quality {log.sleep_quality}/10
-                </span>
-                {log.symptoms.map((symptom) => (
-                  <span
-                    key={`${log.id}-${symptom}`}
-                    className="rounded-full border border-primary-200/60 bg-primary-50/65 px-2.5 py-1 text-xs text-slate-600"
-                  >
-                    {getSymptomLabel(symptom)}
-                  </span>
-                ))}
-              </div>
-              {log.notes ? (
-                <p className="mt-5 rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm leading-6 text-slate-700">
-                  {log.notes}
-                </p>
-              ) : null}
-            </article>
-          ))
+              </article>
+            );
+          })
         ) : (
           <EmptyState
             title="Nothing matches those dates"
@@ -131,7 +125,7 @@ export function JournalHistory({ logs }: { logs: DailyLog[] }) {
             secondaryAction={
               <Link
                 href="/log"
-                className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 hover:bg-warm-100"
+                className="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 hover:bg-warm-100"
               >
                 Open daily log
               </Link>

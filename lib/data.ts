@@ -3,7 +3,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   dateDiffInDays,
   formatDose,
-  formatHours,
   todayIso,
 } from "@/lib/utils";
 
@@ -21,6 +20,10 @@ export type TimelineItem =
       detail: string;
       note?: string | null;
       severeFlag: boolean;
+      anxiety: number;
+      mood: number;
+      sleepHours: number;
+      symptoms: string[];
     }
   | {
       id: string;
@@ -195,9 +198,13 @@ export async function getTimelineData(userId: string) {
     date: log.log_date,
     dose: log.dose,
     title: "Daily check-in",
-    detail: `Dose ${formatDose(log.dose)}. Anxiety ${log.anxiety}/10. Mood ${log.mood}/10. Sleep ${formatHours(log.sleep_hours)}.`,
+    detail: "A quick note from this day.",
     note: log.notes,
     severeFlag: log.severe_flag,
+    anxiety: log.anxiety,
+    mood: log.mood,
+    sleepHours: log.sleep_hours,
+    symptoms: log.symptoms,
   }));
 
   const eventItems = ((events as DoseEvent[] | null) ?? []).map((event) => ({

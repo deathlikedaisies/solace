@@ -18,6 +18,22 @@ import { cn, describeRelativeDate, shiftIsoDate } from "@/lib/utils";
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
 
 const defaultSuccessMessage = "You can come back later if anything changes.";
+const commonSymptoms = new Set<string>([
+  "Irritability",
+  "Headache",
+  "Muscle tension",
+  "Fatigue",
+  "Insomnia",
+  "Dizziness",
+  "GI upset",
+  "Intrusive thoughts",
+]);
+const quickPresets = [
+  { label: "Calm", anxiety: 2, mood: 7, sleepQuality: 7 },
+  { label: "Okay", anxiety: 4, mood: 5, sleepQuality: 5 },
+  { label: "Rough", anxiety: 6, mood: 4, sleepQuality: 4 },
+  { label: "Very difficult", anxiety: 8, mood: 2, sleepQuality: 2 },
+] as const;
 
 type DailyCheckInFormProps = {
   profileDose: number;
@@ -63,11 +79,20 @@ export function DailyCheckInForm({
   const [sleepHours, setSleepHours] = useState(initialDraft.sleepHours);
   const [symptoms, setSymptoms] = useState<string[]>(initialDraft.symptoms);
   const [notes, setNotes] = useState(initialDraft.notes);
+  const [showAllSymptoms, setShowAllSymptoms] = useState(false);
 
   const selectedLog = logsByDate[logDate] ?? null;
   const yesterday = shiftIsoDate(today, -1);
   const isToday = logDate === today;
   const relativeDate = describeRelativeDate(logDate, today);
+  const visibleGroups = symptomGroups
+    .map((group) => ({
+      ...group,
+      symptoms: showAllSymptoms
+        ? group.symptoms
+        : group.symptoms.filter((symptom) => commonSymptoms.has(symptom) || symptoms.includes(symptom)),
+    }))
+    .filter((group) => group.symptoms.length > 0);
   const isSevere =
     anxiety >= 9 ||
     mood <= 2 ||
@@ -91,12 +116,18 @@ export function DailyCheckInForm({
     setNotes(nextDraft.notes);
   }
 
+  function applyQuickPreset(preset: (typeof quickPresets)[number]) {
+    setAnxiety(preset.anxiety);
+    setMood(preset.mood);
+    setSleepQuality(preset.sleepQuality);
+  }
+
   if (state.status === "success") {
     return (
       <Card className="rounded-[2rem] p-6 sm:p-8">
         <div className="rounded-[1.75rem] border border-success-500/15 bg-success-100/85 px-5 py-6 text-success-500">
-          <p className="text-sm font-medium">Saved for {relativeDate}.</p>
-          <p className="mt-1 text-sm leading-6 text-slate-700">
+          <p className="text-base font-semibold text-slate-900">Saved for {relativeDate}.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
             You can come back later if anything changes.
           </p>
           {state.message !== defaultSuccessMessage ? (
@@ -115,128 +146,163 @@ export function DailyCheckInForm({
 
   return (
     <Card className="rounded-[2rem] p-6 sm:p-8">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-[1.7rem] font-semibold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-[1.85rem] font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Daily check-in
           </h2>
-          <p className="text-sm leading-6 text-slate-600">
+          <p className="mt-1 text-base leading-7 text-slate-700">
             A brief note for {relativeDate}.
           </p>
         </div>
         {selectedLog ? (
-          <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-slate-700">
+          <span className="rounded-full bg-primary-100 px-3 py-1.5 text-sm font-medium text-slate-800">
             Updating this day&apos;s note
           </span>
         ) : null}
       </div>
 
-      <form action={formAction} className="mt-7 space-y-6">
+      <form action={formAction} className="mt-8 space-y-8">
         <input type="hidden" name="symptoms" value={JSON.stringify(symptoms)} />
 
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => loadDate(today)}
-              className={cn(
-                "focus-ring rounded-full border px-4 py-2 text-sm font-medium",
-                isToday
-                  ? "border-primary-300 bg-primary-100 text-slate-900"
-                  : "border-slate-200 bg-white/92 text-slate-700 hover:border-primary-200",
-              )}
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={() => loadDate(yesterday)}
-              className={cn(
-                "focus-ring rounded-full border px-4 py-2 text-sm font-medium",
-                logDate === yesterday
-                  ? "border-primary-300 bg-primary-100 text-slate-900"
-                  : "border-slate-200 bg-white/92 text-slate-700 hover:border-primary-200",
-              )}
-            >
-              Yesterday
-            </button>
+        <section className="space-y-4">
+          <div>
+            <h3 className="text-base font-medium text-slate-800">Today felt</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Pick the closest starting point, then adjust anything that needs it.
+            </p>
           </div>
-          <p className="text-xs leading-5 text-slate-500">
-            Missed a recent day? Switching dates loads that day&apos;s note if one is already there.
-          </p>
-        </div>
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {quickPresets.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => applyQuickPreset(preset)}
+                className="focus-ring min-h-12 rounded-2xl border border-slate-200 bg-white/92 px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-primary-200"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-slate-700">Date</span>
-            <input
-              required
-              type="date"
-              name="logDate"
-              value={logDate}
-              onChange={(event) => loadDate(event.target.value)}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
-            />
-          </label>
-          <div className="space-y-2">
+        <section className="space-y-4">
+          <div>
+            <h3 className="text-base font-medium text-slate-800">Date and dose</h3>
+          </div>
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => loadDate(today)}
+                className={cn(
+                  "focus-ring min-h-12 rounded-full border px-4 py-2 text-sm font-medium",
+                  isToday
+                    ? "border-primary-300 bg-primary-100 text-slate-900"
+                    : "border-slate-200 bg-white/92 text-slate-700 hover:border-primary-200",
+                )}
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => loadDate(yesterday)}
+                className={cn(
+                  "focus-ring min-h-12 rounded-full border px-4 py-2 text-sm font-medium",
+                  logDate === yesterday
+                    ? "border-primary-300 bg-primary-100 text-slate-900"
+                    : "border-slate-200 bg-white/92 text-slate-700 hover:border-primary-200",
+                )}
+              >
+                Yesterday
+              </button>
+            </div>
+            <p className="text-sm leading-6 text-slate-600">
+              Switching dates loads that day&apos;s note if one is already there.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-700">Dose (mg)</span>
+              <span className="text-sm font-medium text-slate-700">Date</span>
               <input
                 required
-                min="0.01"
-                step="0.01"
-                type="number"
-                name="dose"
-                value={dose}
-                onChange={(event) => setDose(Number(event.target.value))}
-                className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
+                type="date"
+                name="logDate"
+                value={logDate}
+                onChange={(event) => loadDate(event.target.value)}
+                className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-base text-slate-900"
               />
             </label>
-            <ApproximateDoseReferenceTool
-              defaultMedication={profileMedication}
-              defaultDose={dose}
-            />
+            <div className="space-y-2">
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-slate-700">Dose (mg)</span>
+                <input
+                  required
+                  min="0.01"
+                  step="0.01"
+                  type="number"
+                  name="dose"
+                  value={dose}
+                  onChange={(event) => setDose(Number(event.target.value))}
+                  className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-base text-slate-900"
+                />
+              </label>
+              <ApproximateDoseReferenceTool
+                defaultMedication={profileMedication}
+                defaultDose={dose}
+              />
+            </div>
           </div>
-          <ScoreField
-            label="Anxiety"
-            name="anxiety"
-            value={anxiety}
-            onChange={setAnxiety}
-          />
-          <ScoreField label="Mood" name="mood" value={mood} onChange={setMood} />
-          <ScoreField
-            label="Sleep quality"
-            name="sleepQuality"
-            value={sleepQuality}
-            onChange={setSleepQuality}
-          />
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-slate-700">Sleep hours</span>
-            <input
-              required
-              min="0"
-              max="24"
-              step="0.5"
-              type="number"
-              name="sleepHours"
-              value={sleepHours}
-              onChange={(event) => setSleepHours(Number(event.target.value))}
-              className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-sm text-slate-900"
-            />
-          </label>
-        </div>
+        </section>
 
-        <div className="space-y-4">
+        <section className="space-y-5">
           <div>
-            <h3 className="text-sm font-medium text-slate-700">Symptoms</h3>
+            <h3 className="text-base font-medium text-slate-800">How today felt</h3>
           </div>
-          <div className="space-y-6">
-            {symptomGroups.map((group) => (
-              <div key={group.title} className="space-y-3 pt-1 first:pt-0">
-                <p className="text-[11px] font-normal tracking-[0.01em] text-slate-400">
-                  {group.title}
-                </p>
-                <div className="flex flex-wrap gap-2">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <ScoreField
+              label="Anxiety"
+              name="anxiety"
+              value={anxiety}
+              onChange={setAnxiety}
+            />
+            <ScoreField label="Mood" name="mood" value={mood} onChange={setMood} />
+            <ScoreField
+              label="Sleep quality"
+              name="sleepQuality"
+              value={sleepQuality}
+              onChange={setSleepQuality}
+            />
+            <label className="space-y-2">
+              <span className="text-sm font-medium text-slate-700">Sleep hours</span>
+              <input
+                required
+                min="0"
+                max="24"
+                step="0.5"
+                type="number"
+                name="sleepHours"
+                value={sleepHours}
+                onChange={(event) => setSleepHours(Number(event.target.value))}
+                className="focus-ring min-h-12 w-full rounded-2xl border border-slate-200 bg-white/92 px-4 text-base text-slate-900"
+              />
+            </label>
+          </div>
+        </section>
+
+        <section className="space-y-5">
+          <div className="space-y-2">
+            <h3 className="text-base font-medium text-slate-800">Symptoms</h3>
+            <p className="text-sm leading-6 text-slate-600">
+              Start with the most common ones. You can open the full list if you need it.
+            </p>
+          </div>
+          <div className="space-y-7">
+            {visibleGroups.map((group) => (
+              <div key={group.title} className="space-y-3">
+                <p className="text-sm font-medium text-slate-600">{group.title}</p>
+                <div className="flex flex-wrap gap-2.5">
                   {group.symptoms.map((symptom) => {
                     const active = symptoms.includes(symptom);
 
@@ -252,7 +318,7 @@ export function DailyCheckInForm({
                           )
                         }
                         className={cn(
-                          "focus-ring rounded-full border px-4 py-2 text-sm",
+                          "focus-ring min-h-12 rounded-full border px-4 py-2 text-sm font-medium",
                           active
                             ? "border-primary-300 bg-primary-100 text-slate-900"
                             : "border-slate-200 bg-white/90 text-slate-700 hover:border-primary-200",
@@ -266,19 +332,28 @@ export function DailyCheckInForm({
               </div>
             ))}
           </div>
-        </div>
+          <button
+            type="button"
+            onClick={() => setShowAllSymptoms((current) => !current)}
+            className="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/92 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-warm-100"
+          >
+            {showAllSymptoms ? "Show fewer symptoms" : "Show more symptoms"}
+          </button>
+        </section>
 
-        <label className="block space-y-2">
-          <span className="text-sm font-medium text-slate-700">Notes</span>
-          <textarea
-            rows={4}
-            name="notes"
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/92 px-4 py-3 text-sm text-slate-900"
-            placeholder="Anything you want to remember later."
-          />
-        </label>
+        <section className="space-y-2">
+          <label className="block space-y-2">
+            <span className="text-base font-medium text-slate-800">Notes</span>
+            <textarea
+              rows={4}
+              name="notes"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              className="focus-ring w-full rounded-[1.5rem] border border-slate-200 bg-white/92 px-4 py-3 text-base text-slate-900"
+              placeholder="Anything you want to remember later."
+            />
+          </label>
+        </section>
 
         {isSevere ? (
           <div className="rounded-[1.5rem] border border-danger-500/20 bg-danger-100 px-4 py-3 text-sm leading-6 text-danger-500">
@@ -308,16 +383,45 @@ type ScoreFieldProps = {
 };
 
 function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
+  const decrease = () => onChange(clampScore(value - 1));
+  const increase = () => onChange(clampScore(value + 1));
+
   return (
     <label className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-700">{label}</span>
-        <span className="rounded-full bg-warm-100 px-3 py-1 text-xs font-medium text-slate-600">
-          {value}/10
-        </span>
+      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={decrease}
+          className="focus-ring inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-slate-200 bg-white/92 text-lg font-medium text-slate-800 hover:bg-warm-100"
+          aria-label={`Lower ${label}`}
+        >
+          -
+        </button>
+        <input
+          name={name}
+          type="number"
+          min="0"
+          max="10"
+          step="1"
+          inputMode="numeric"
+          value={value}
+          onChange={(event) => onChange(clampScore(Number(event.target.value)))}
+          className="focus-ring min-h-12 w-28 rounded-2xl border border-slate-200 bg-white/92 px-4 text-center text-base font-medium text-slate-900"
+          aria-label={`${label} score`}
+        />
+        <span className="text-sm text-slate-600">/ 10</span>
+        <button
+          type="button"
+          onClick={increase}
+          className="focus-ring inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-slate-200 bg-white/92 text-lg font-medium text-slate-800 hover:bg-warm-100"
+          aria-label={`Raise ${label}`}
+        >
+          +
+        </button>
       </div>
       <input
-        name={name}
+        name={`${name}Slider`}
         type="range"
         min="0"
         max="10"
@@ -325,9 +429,18 @@ function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className="w-full"
+        aria-label={`${label} slider`}
       />
     </label>
   );
+}
+
+function clampScore(value: number) {
+  if (Number.isNaN(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(10, value));
 }
 
 function buildDraft(log: DailyLog | null, profileDose: number): DraftValues {

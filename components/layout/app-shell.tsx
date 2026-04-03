@@ -19,12 +19,9 @@ export function AppShell({ children, user }: AppShellProps) {
           <Logo className="text-sm tracking-[0.14em] text-slate-600" />
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <div className="min-w-0 sm:text-right">
-              <p className="truncate text-sm font-medium text-slate-700">
-                {user.email ?? "Signed in"}
-              </p>
-              <p className="text-xs text-slate-500">Private account</p>
-            </div>
+            <p className="min-w-0 truncate text-sm font-medium text-slate-700 sm:max-w-64 sm:text-right">
+              {user.email ?? "Signed in"}
+            </p>
             <form action={signOutAction}>
               <Button variant="secondary" type="submit" className="w-full sm:w-auto">
                 Log out

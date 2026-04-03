@@ -28,7 +28,7 @@ export function NavLinks() {
           );
         })}
       </nav>
-      <nav className="flex gap-2 overflow-x-auto pb-1 md:hidden">
+      <nav className="grid grid-cols-2 gap-2 md:hidden">
         {navItems.map((item) => {
           const active = pathname.startsWith(item.href);
 
@@ -37,7 +37,7 @@ export function NavLinks() {
               key={item.href}
               href={item.href}
               className={cn(
-                "focus-ring inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/75 px-4 py-2 text-sm font-medium text-slate-600",
+                "focus-ring inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm font-medium text-slate-700",
                 active && "border-primary-200 bg-primary-100 text-slate-900",
               )}
             >

@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/shared";
 
-const authRoutes = ["/login", "/signup"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
 const protectedRoutes = ["/dashboard", "/log", "/journal", "/onboarding", "/timeline"];
 
 export async function proxy(request: NextRequest) {

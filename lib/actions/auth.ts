@@ -85,6 +85,37 @@ export async function signUpAction(
   };
 }
 
+export async function requestPasswordResetAction(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    return {
+      status: "error",
+      message: "Enter your email to get a reset link.",
+    };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${getAuthRedirectBaseUrl()}/reset-password`,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: formatAuthError(error.message, "reset"),
+    };
+  }
+
+  return {
+    status: "success",
+    message: "If that email is in Solace, a reset link is on the way.",
+  };
+}
+
 export async function signOutAction() {
   const supabase = await createServerSupabaseClient();
   await supabase.auth.signOut();
@@ -131,7 +162,7 @@ function sanitizeExternalUrl(value: string) {
   }
 }
 
-function formatAuthError(message: string, mode: "sign-in" | "sign-up") {
+function formatAuthError(message: string, mode: "sign-in" | "sign-up" | "reset") {
   const normalized = message.toLowerCase();
 
   if (normalized.includes("rate limit")) {
@@ -150,6 +181,10 @@ function formatAuthError(message: string, mode: "sign-in" | "sign-up") {
 
   if (normalized.includes("invalid login credentials")) {
     return "That email and password did not match. Try again.";
+  }
+
+  if (mode === "reset") {
+    return "We couldn't send a reset link right now. Please try again in a minute.";
   }
 
   return message;
