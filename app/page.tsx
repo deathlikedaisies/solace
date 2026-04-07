@@ -1,16 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { homeHighlights } from "@/lib/constants";
 import { Logo } from "@/components/branding/logo";
-import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { getOptionalUser } from "@/lib/auth";
-
-const homeDetails = [
-  "Where you started and where you are now",
-  "Short daily notes for symptoms, mood, and sleep",
-  "A clearer sense of what tends to change after a dose shift",
-] as const;
 
 export default async function HomePage() {
   const user = await getOptionalUser();
@@ -20,74 +12,47 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-6 sm:px-8 lg:justify-center">
-      <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-        <div className="space-y-6 rounded-[2rem] border border-white/70 bg-[rgba(251,248,243,0.82)] p-7 shadow-[0_24px_80px_rgba(54,66,82,0.08)] backdrop-blur sm:p-10">
-          <div className="space-y-3">
-            <Logo className="text-sm tracking-[0.14em] text-slate-600" />
-            <div className="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-medium tracking-[0.24em] text-sky-700 uppercase">
-              Private notes for your taper
-            </div>
-          </div>
-          <div className="space-y-4">
-            <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-              A quiet place to keep track of how things have been.
-            </h1>
-            <p className="max-w-xl text-base leading-7 text-slate-800 sm:text-lg">
-              When days feel foggy or difficult, Solace keeps the dose, symptoms, sleep, and small details in one place.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/signup">Create an account</ButtonLink>
-            <ButtonLink href="/login" variant="secondary">
-              Log in
-            </ButtonLink>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {homeDetails.map((detail) => (
-              <div
-                key={detail}
-                className="rounded-[1.5rem] bg-white/78 px-4 py-4 text-sm leading-6 font-medium text-slate-800"
-              >
-                {detail}
-              </div>
-            ))}
-          </div>
-          <p className="text-sm leading-6 text-slate-700">
-            Private by default. No medical advice.
+    <main className="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-5 pb-16 pt-12 sm:px-8 sm:pb-20 sm:pt-20">
+      <section className="w-full pb-12 text-left">
+        <div className="mb-3 space-y-3">
+          <Logo className="text-sm tracking-[0.14em] text-slate-600" />
+          <p className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase opacity-60">
+            Private notes for your taper
           </p>
         </div>
 
-        <Card className="space-y-5 rounded-[2rem] p-7 sm:p-8">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold tracking-[0.22em] text-slate-600 uppercase">
-              What stays here
-            </p>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-              The details you may want later.
-            </h2>
-          </div>
-          <div className="space-y-3">
-            {homeHighlights.map((feature) => (
-              <div
-                key={feature}
-                className="flex items-start gap-3 rounded-2xl bg-warm-100/85 p-4"
-              >
-                <div className="mt-1 h-2.5 w-2.5 rounded-full bg-secondary-400" />
-                <p className="text-sm leading-6 font-medium text-slate-800">{feature}</p>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-2xl bg-primary-50/90 p-4 text-sm leading-6 font-medium text-slate-800">
-            When you want to look back, it is all still in one place.
-          </div>
-          <Link
-            href="/signup"
-            className="inline-flex text-sm font-semibold text-primary-700 transition hover:text-primary-500"
-          >
-            Start with email and password
-          </Link>
-        </Card>
+        <h1 className="mb-5 max-w-[20ch] text-[2rem] leading-[1.2] font-semibold tracking-tight text-slate-900 sm:text-[3rem]">
+          A quiet place to keep track of how things have been.
+        </h1>
+
+        <p className="mb-8 max-w-[40ch] text-base leading-[1.6] text-slate-700 opacity-80 sm:text-lg">
+          When days feel foggy or difficult, Solace keeps your dose, symptoms, sleep, and notes in one place.
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          <ButtonLink href="/signup">Create an account</ButtonLink>
+          <ButtonLink href="/login" variant="secondary">
+            Log in
+          </ButtonLink>
+        </div>
+
+        <p className="mt-6 text-[13px] leading-6 text-slate-600 opacity-60">
+          Private by default. No medical advice.
+        </p>
+      </section>
+
+      <section className="mt-16 w-full max-w-[720px]">
+        <h2 className="mb-4 text-lg font-medium text-slate-800">
+          What you can keep here
+        </h2>
+        <ul className="space-y-3 text-[15px] leading-[1.6] text-slate-700 opacity-85 sm:text-base">
+          {homeHighlights.map((highlight) => (
+            <li key={highlight} className="flex items-start gap-3">
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary-300" />
+              <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
       </section>
     </main>
   );
