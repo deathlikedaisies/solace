@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/form-state";
 
-const defaultAuthRedirectBaseUrl = "https://solace-taper.vercel.app";
+const liveAuthRedirectBaseUrl = "https://solace-taper.vercel.app";
 
 export async function signInAction(
   _prevState: FormState,
@@ -131,35 +131,7 @@ function getSafeRedirectTarget(target: string) {
 }
 
 function getAuthRedirectBaseUrl() {
-  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-
-  if (configuredUrl) {
-    const sanitized = sanitizeExternalUrl(configuredUrl);
-
-    if (sanitized) {
-      return sanitized;
-    }
-  }
-
-  return defaultAuthRedirectBaseUrl;
-}
-
-function sanitizeExternalUrl(value: string) {
-  try {
-    const url = new URL(value);
-
-    if (
-      url.hostname === "localhost" ||
-      url.hostname === "127.0.0.1" ||
-      url.hostname.endsWith(".local")
-    ) {
-      return null;
-    }
-
-    return `${url.protocol}//${url.host}`;
-  } catch {
-    return null;
-  }
+  return liveAuthRedirectBaseUrl;
 }
 
 function formatAuthError(message: string, mode: "sign-in" | "sign-up" | "reset") {

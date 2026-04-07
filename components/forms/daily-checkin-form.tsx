@@ -80,6 +80,7 @@ export function DailyCheckInForm({
   const [symptoms, setSymptoms] = useState<string[]>(initialDraft.symptoms);
   const [notes, setNotes] = useState(initialDraft.notes);
   const [showAllSymptoms, setShowAllSymptoms] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   const selectedLog = logsByDate[logDate] ?? null;
   const yesterday = shiftIsoDate(today, -1);
@@ -90,7 +91,9 @@ export function DailyCheckInForm({
       ...group,
       symptoms: showAllSymptoms
         ? group.symptoms
-        : group.symptoms.filter((symptom) => commonSymptoms.has(symptom) || symptoms.includes(symptom)),
+        : group.symptoms.filter(
+            (symptom) => commonSymptoms.has(symptom) || symptoms.includes(symptom),
+          ),
     }))
     .filter((group) => group.symptoms.length > 0);
   const isSevere =
@@ -114,12 +117,14 @@ export function DailyCheckInForm({
     setSleepHours(nextDraft.sleepHours);
     setSymptoms(nextDraft.symptoms);
     setNotes(nextDraft.notes);
+    setSelectedPreset(null);
   }
 
   function applyQuickPreset(preset: (typeof quickPresets)[number]) {
     setAnxiety(preset.anxiety);
     setMood(preset.mood);
     setSleepQuality(preset.sleepQuality);
+    setSelectedPreset(preset.label);
   }
 
   if (state.status === "success") {
@@ -173,17 +178,32 @@ export function DailyCheckInForm({
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            {quickPresets.map((preset) => (
-              <button
-                key={preset.label}
-                type="button"
-                onClick={() => applyQuickPreset(preset)}
-                className="focus-ring min-h-12 rounded-2xl border border-slate-200 bg-white/92 px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-primary-200"
-              >
-                {preset.label}
-              </button>
-            ))}
+            {quickPresets.map((preset) => {
+              const active = selectedPreset === preset.label;
+
+              return (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => applyQuickPreset(preset)}
+                  className={cn(
+                    "focus-ring min-h-12 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition",
+                    active
+                      ? "border-primary-300 bg-primary-100 text-slate-900"
+                      : "border-slate-200 bg-white/92 text-slate-800 hover:border-primary-200",
+                  )}
+                  aria-pressed={active}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
           </div>
+          <p className="text-sm leading-6 text-slate-600">
+            {selectedPreset
+              ? `${selectedPreset} selected. Anxiety, mood, and sleep quality were updated below.`
+              : "This sets anxiety, mood, and sleep quality as a starting point."}
+          </p>
         </section>
 
         <section className="space-y-4">
@@ -265,14 +285,28 @@ export function DailyCheckInForm({
               label="Anxiety"
               name="anxiety"
               value={anxiety}
-              onChange={setAnxiety}
+              onChange={(nextValue) => {
+                setAnxiety(nextValue);
+                setSelectedPreset(null);
+              }}
             />
-            <ScoreField label="Mood" name="mood" value={mood} onChange={setMood} />
+            <ScoreField
+              label="Mood"
+              name="mood"
+              value={mood}
+              onChange={(nextValue) => {
+                setMood(nextValue);
+                setSelectedPreset(null);
+              }}
+            />
             <ScoreField
               label="Sleep quality"
               name="sleepQuality"
               value={sleepQuality}
-              onChange={setSleepQuality}
+              onChange={(nextValue) => {
+                setSleepQuality(nextValue);
+                setSelectedPreset(null);
+              }}
             />
             <label className="space-y-2">
               <span className="text-sm font-medium text-slate-700">Sleep hours</span>
@@ -421,7 +455,6 @@ function ScoreField({ label, name, value, onChange }: ScoreFieldProps) {
         </button>
       </div>
       <input
-        name={`${name}Slider`}
         type="range"
         min="0"
         max="10"

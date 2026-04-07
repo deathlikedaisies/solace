@@ -91,6 +91,10 @@ const referenceTable: Record<BenzodiazepineOption, BenzodiazepineReference> = {
   },
 };
 
+const defaultCaution = "Approximate only. Different sources use slightly different estimates.";
+const defaultCautionDetail =
+  "Individual response varies. Do not use this alone to change your medication. Review medication changes with your clinician.";
+
 export type DiazepamEquivalentEstimate =
   | {
       kind: "diazepam";
@@ -127,7 +131,14 @@ export function getApproximateDiazepamEquivalent(
   medication: string | null | undefined,
   dose: number | null | undefined,
 ): DiazepamEquivalentEstimate | null {
-  if (!medication || dose === null || dose === undefined || Number.isNaN(dose) || dose <= 0) {
+  if (
+    !medication ||
+    dose === null ||
+    dose === undefined ||
+    Number.isNaN(dose) ||
+    !Number.isFinite(dose) ||
+    dose <= 0
+  ) {
     return null;
   }
 
@@ -148,25 +159,24 @@ export function getApproximateDiazepamEquivalent(
       dose,
       summary: "Your current dose is already diazepam.",
       summaryShort: "Current dose is already diazepam.",
-      caution: "Approximate only. Different sources use slightly different estimates.",
-      cautionDetail:
-        "Individual response varies. Do not use this alone to change your medication. Review medication changes with your clinician.",
+      caution: defaultCaution,
+      cautionDetail: defaultCautionDetail,
     };
   }
 
   if (reference.kind === "fixed") {
     const diazepamEquivalent = roundEstimate((dose / reference.medicationMg) * reference.diazepamMg);
+    const formattedEquivalent = formatApproximateDose(diazepamEquivalent);
 
     return {
       kind: "fixed",
       medication,
       dose,
       diazepamEquivalent,
-      summary: `Your current dose is roughly similar to ${formatDose(diazepamEquivalent)} of diazepam.`,
-      summaryShort: `Roughly similar to ${formatDose(diazepamEquivalent)} diazepam.`,
-      caution: "Approximate only. Different sources use slightly different estimates.",
-      cautionDetail:
-        "Individual response varies. Do not use this alone to change your medication. Review medication changes with your clinician.",
+      summary: `Your current dose is roughly similar to ${formattedEquivalent} of diazepam.`,
+      summaryShort: `Roughly similar to ${formattedEquivalent} diazepam.`,
+      caution: defaultCaution,
+      cautionDetail: defaultCautionDetail,
     };
   }
 
@@ -176,6 +186,8 @@ export function getApproximateDiazepamEquivalent(
   const diazepamEquivalentHigh = roundEstimate(
     (dose / reference.medicationMgLow) * reference.diazepamMg,
   );
+  const formattedLow = formatApproximateDose(diazepamEquivalentLow);
+  const formattedHigh = formatApproximateDose(diazepamEquivalentHigh);
 
   return {
     kind: "range",
@@ -183,11 +195,10 @@ export function getApproximateDiazepamEquivalent(
     dose,
     diazepamEquivalentLow,
     diazepamEquivalentHigh,
-    summary: `Your current dose is roughly similar to about ${formatDose(diazepamEquivalentLow)} to ${formatDose(diazepamEquivalentHigh)} of diazepam.`,
-    summaryShort: `Roughly similar to about ${formatDose(diazepamEquivalentLow)} to ${formatDose(diazepamEquivalentHigh)} diazepam.`,
-    caution: "Approximate only. Different sources use slightly different estimates. This estimate is broader for flurazepam.",
-    cautionDetail:
-      "Individual response varies. Do not use this alone to change your medication. Review medication changes with your clinician.",
+    summary: `Your current dose is roughly similar to about ${formattedLow} to ${formattedHigh} of diazepam.`,
+    summaryShort: `Roughly similar to about ${formattedLow} to ${formattedHigh} diazepam.`,
+    caution: `${defaultCaution} This estimate is broader for flurazepam.`,
+    cautionDetail: defaultCautionDetail,
   };
 }
 
@@ -195,6 +206,34 @@ export function isKnownBenzodiazepine(value: string): value is BenzodiazepineOpt
   return benzodiazepineOptions.includes(value as BenzodiazepineOption);
 }
 
+export function formatApproximateDose(value: number) {
+  if (!Number.isFinite(value) || value <= 0) {
+    return "0 mg";
+  }
+
+  if (value < 0.1) {
+    return "< 0.1 mg";
+  }
+
+  if (Number.isInteger(value)) {
+    return formatDose(value);
+  }
+
+  return `${value.toFixed(1)} mg`;
+}
+
 function roundEstimate(value: number) {
-  return Number(value.toFixed(value >= 10 || Number.isInteger(value) ? 0 : 1));
+  if (!Number.isFinite(value) || value <= 0) {
+    return 0;
+  }
+
+  if (value < 0.1) {
+    return Number(value.toFixed(2));
+  }
+
+  if (Number.isInteger(value)) {
+    return value;
+  }
+
+  return Number(value.toFixed(1));
 }
