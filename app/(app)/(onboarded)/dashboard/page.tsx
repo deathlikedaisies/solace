@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { MetricChart } from "@/components/charts/metric-chart";
 import { DoctorVisitSummaryPanel } from "@/components/doctor-visit/doctor-visit-summary-panel";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { ExportLogsButton } from "@/components/export/export-logs-button";
-import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth";
-import { getDashboardData } from "@/lib/data";
+import { getDashboardData, hasMedicationDetails } from "@/lib/data";
 import { buildDoctorVisitSummary } from "@/lib/doctor-visit-summary";
-import {  describeRelativeDate,
-  formatCompactDate,
+import {
+  describeRelativeDate,
   formatDate,
   formatDose,
   formatHours,
@@ -18,22 +19,51 @@ import {  describeRelativeDate,
 
 export default async function DashboardPage() {
   const user = await requireUser("/dashboard");
-  const { profile, logs, latestLog, todayLog, averages, streak, events, insights } =
-    await getDashboardData(user.id);
+  const {
+    profile,
+    logs,
+    doseLogs,
+    latestLog,
+    latestDoseLog,
+    todayLog,
+    averages,
+    streak,
+    events,
+    insights,
+  } = await getDashboardData(user.id);
+  const hasMedication = hasMedicationDetails(profile);
 
-  if (!profile) {
-    return null;
+  if (!logs.length && !hasMedication) {
+    redirect("/onboarding");
   }
 
-  const doctorVisitSummary = buildDoctorVisitSummary(profile, logs);
+  if (!logs.length) {
+    return (
+      <EmptyState
+        title="Start with today"
+        description="One brief note is enough to get your timeline and journal started."
+        actionHref="/log"
+        actionLabel="Open daily log"
+        secondaryAction={<ExportLogsButton disabled />}
+      />
+    );
+  }
+
   const chartData = logs.slice(-21);
-  const chartStart = chartData[0]?.log_date;
+  const doseChartData = doseLogs
+    .slice(-21)
+    .map((log) => ({ date: log.log_date, value: log.dose }));
+  const chartStart = doseChartData[0]?.date;
   const reductionMarkers = events
     .filter((event) => event.event_type === "reduction")
     .filter((event) => !chartStart || event.event_date >= chartStart)
     .map((event) => ({ date: event.event_date, label: "Dose change" }));
-  const startingDose = profile.starting_dose ?? profile.current_dose;
-  const doseChange = Number((startingDose - profile.current_dose).toFixed(2));
+  const currentDose = profile?.current_dose ?? latestDoseLog?.dose ?? null;
+  const startingDose = profile?.starting_dose ?? profile?.current_dose ?? currentDose;
+  const doseChange =
+    startingDose !== null && currentDose !== null
+      ? Number((startingDose - currentDose).toFixed(2))
+      : 0;
   const previousWeek = logs.slice(-14, -7);
   const previousSymptomAverage = average(previousWeek.map((log) => log.symptoms.length));
   const previousAnxietyAverage = average(previousWeek.map((log) => log.anxiety));
@@ -63,15 +93,26 @@ export default async function DashboardPage() {
     ? "You've checked in today."
     : latestLog
       ? `Last entry: ${describeRelativeDate(latestLog.log_date)}.`
-      : "Start with today, or add a recent day you missed.";
-  const changeCue = doseChange > 0 ? `Down from ${formatDose(startingDose)}` : "No change today";
+      : "Start with today when you're ready.";
+  const changeCue =
+    currentDose !== null && doseChange > 0
+      ? `Down from ${formatDose(startingDose)}`
+      : currentDose !== null
+        ? "No change today"
+        : "Dose not added yet";
   const continuityLine =
     streak > 0
       ? `${streak} day${streak === 1 ? "" : "s"} in a row`
       : latestLog
-        ? "Pick up again when you are ready."
-        : "The next check-in starts your first run of days.";
+        ? "Come back whenever you want to keep going."
+        : "Your next check-in starts the first stretch of days.";
   const topInsight = insights[0]?.text ?? continuityLine;
+  const primaryAction = !todayLog
+    ? { href: "/log", label: "Start with today" }
+    : !hasMedication
+      ? { href: "/onboarding?step=medication", label: "Add medication" }
+      : { href: "/timeline", label: "View timeline" };
+  const doctorVisitSummary = profile ? buildDoctorVisitSummary(profile, logs) : null;
 
   return (
     <div className="space-y-10">
@@ -87,14 +128,11 @@ export default async function DashboardPage() {
                 {topInsight}
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <ButtonLink href="/log">
-                {todayLog ? "Update today's note" : "Log today"}
-              </ButtonLink>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <ButtonLink href={primaryAction.href}>{primaryAction.label}</ButtonLink>
               <ButtonLink href="/journal" variant="secondary">
                 Open journal
               </ButtonLink>
-              <ExportLogsButton disabled={!logs.length} />
             </div>
           </div>
         </Card>
@@ -102,12 +140,22 @@ export default async function DashboardPage() {
         <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <SummaryCard
             title="Current dose"
-            value={formatDose(profile.current_dose)}
-            detail={`${profile.benzo_name} • ${changeCue}`}
+            value={formatDose(currentDose)}
+            detail={
+              hasMedication && profile
+                ? `${profile.benzo_name} - ${changeCue}`
+                : "Add your medication later if you want it here."
+            }
             extra={
-              <ButtonLink href="/log" variant="secondary" className="mt-4 w-full sm:w-auto">
-                View approximate equivalence
-              </ButtonLink>
+              !hasMedication ? (
+                <ButtonLink
+                  href="/onboarding?step=medication"
+                  variant="secondary"
+                  className="mt-4 w-full sm:w-auto"
+                >
+                  Add medication
+                </ButtonLink>
+              ) : null
             }
           />
           <SummaryCard
@@ -118,118 +166,94 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {!logs.length ? (
-        <EmptyState
-          title="Your overview will take shape as you go"
-          description="Once you save a daily note, your dose, symptoms, mood, and sleep will start to line up here."
-          actionHref="/log"
-          actionLabel="Save your first note"
-          secondaryAction={<ExportLogsButton disabled />}
-        />
-      ) : (
-        <>
-          <section className="space-y-5">
-            <div className="space-y-1 px-1">
-              <h3 className="text-[1.4rem] font-semibold tracking-tight text-slate-900">
-                Recent patterns
-              </h3>
-              <p className="text-sm leading-6 text-slate-600">
-                A simple view of what has been steady and what has shifted.
-              </p>
-            </div>
-            <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-              <MetricChart
-                title="Dose"
-                subtitle={changeCue}
-                data={chartData.map((log) => ({ date: log.log_date, value: log.dose }))}
-                suffix=" mg"
-                markers={reductionMarkers}
-              />
-              <MetricChart
-                title="Symptoms"
-                subtitle={symptomCue}
-                data={chartData.map((log) => ({
-                  date: log.log_date,
-                  value: log.symptoms.length,
-                }))}
-                colorClass="stroke-danger-500"
-                markers={reductionMarkers}
-              />
-              <MetricChart
-                title="Anxiety"
-                subtitle={anxietyCue}
-                data={chartData.map((log) => ({ date: log.log_date, value: log.anxiety }))}
-              />
-              <MetricChart
-                title="Mood"
-                subtitle={moodCue}
-                data={chartData.map((log) => ({ date: log.log_date, value: log.mood }))}
-                colorClass="stroke-lavender-300"
-              />
-              <MetricChart
-                title="Sleep"
-                subtitle={sleepCue}
-                data={chartData.map((log) => ({ date: log.log_date, value: log.sleep_hours }))}
-                colorClass="stroke-secondary-400"
-                suffix=" h"
-              />
-            </div>
-          </section>
+      <section className="space-y-5">
+        <div className="space-y-1 px-1">
+          <h3 className="text-[1.4rem] font-semibold tracking-tight text-slate-900">
+            Recent patterns
+          </h3>
+          <p className="text-sm leading-6 text-slate-600">
+            A simple view of what has been steady and what has shifted.
+          </p>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+          <MetricChart
+            title="Dose"
+            subtitle={changeCue}
+            data={doseChartData}
+            suffix=" mg"
+            markers={reductionMarkers}
+          />
+          <MetricChart
+            title="Symptoms"
+            subtitle={symptomCue}
+            data={chartData.map((log) => ({
+              date: log.log_date,
+              value: log.symptoms.length,
+            }))}
+            colorClass="stroke-danger-500"
+            markers={reductionMarkers}
+          />
+          <MetricChart
+            title="Anxiety"
+            subtitle={anxietyCue}
+            data={chartData.map((log) => ({ date: log.log_date, value: log.anxiety }))}
+          />
+          <MetricChart
+            title="Mood"
+            subtitle={moodCue}
+            data={chartData.map((log) => ({ date: log.log_date, value: log.mood }))}
+            colorClass="stroke-lavender-300"
+          />
+          <MetricChart
+            title="Sleep"
+            subtitle={sleepCue}
+            data={chartData.map((log) => ({ date: log.log_date, value: log.sleep_hours }))}
+            colorClass="stroke-secondary-400"
+            suffix=" h"
+          />
+        </div>
+      </section>
 
-          <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
-            <Card className="rounded-[2rem] p-6 sm:p-7">
-              <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
-                Most recent day
-              </h3>
-              {latestLog ? (
-                <div className="mt-5 space-y-3 text-base leading-7 text-slate-700">
-                  <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-slate-900">
-                    {formatDate(latestLog.log_date)}
-                  </div>
-                  <div className="rounded-[1.5rem] bg-white/80 px-4 py-4">
-                    <p><span className="font-medium text-slate-900">Dose</span> {formatDose(latestLog.dose)}</p>
-                    <p><span className="font-medium text-slate-900">Anxiety</span> {latestLog.anxiety}/10</p>
-                    <p><span className="font-medium text-slate-900">Mood</span> {latestLog.mood}/10</p>
-                    <p><span className="font-medium text-slate-900">Sleep</span> {formatHours(latestLog.sleep_hours)}</p>
-                  </div>
-                  <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 leading-6 text-slate-700">
-                    Recent averages: anxiety {averages.anxiety}/10, mood {averages.mood}/10, sleep {formatHours(averages.sleepHours)}, symptoms {averages.symptomLoad}/day.
-                  </div>
-                </div>
-              ) : (
-                <p className="mt-4 rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-sm leading-6 text-slate-500">
-                  Your most recent day will appear here.
-                </p>
-              )}
-            </Card>
-
-            <Card className="rounded-[2rem] p-6 sm:p-7">
-              <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
-                Taper snapshot
-              </h3>
-              <div className="mt-5 space-y-3 text-base leading-7 text-slate-700">
-                <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 text-slate-700">
-                  {continuityLine}
-                </div>
-                <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  <span className="font-medium text-slate-900">Medication</span> {profile.benzo_name}
-                </div>
-                <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  <span className="font-medium text-slate-900">Started from</span> {formatDose(startingDose)}
-                </div>
-                <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  <span className="font-medium text-slate-900">Now at</span> {formatDose(profile.current_dose)}
-                </div>
-                <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3">
-                  <span className="font-medium text-slate-900">Taper start</span> {formatCompactDate(profile.taper_start_date)}
-                </div>
+      <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
+        <Card className="rounded-[2rem] p-6 sm:p-7">
+          <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
+            Most recent day
+          </h3>
+          {latestLog ? (
+            <div className="mt-5 space-y-3 text-base leading-7 text-slate-700">
+              <div className="rounded-[1.5rem] bg-warm-100/90 px-4 py-3 text-slate-900">
+                {formatDate(latestLog.log_date)}
               </div>
-            </Card>
-          </section>
+              <div className="rounded-[1.5rem] bg-white/80 px-4 py-4">
+                <p><span className="font-medium text-slate-900">Dose</span> {formatDose(latestLog.dose)}</p>
+                <p><span className="font-medium text-slate-900">Anxiety</span> {latestLog.anxiety}/10</p>
+                <p><span className="font-medium text-slate-900">Mood</span> {latestLog.mood}/10</p>
+                <p><span className="font-medium text-slate-900">Sleep</span> {formatHours(latestLog.sleep_hours)}</p>
+              </div>
+              <div className="rounded-[1.5rem] bg-primary-50/90 px-4 py-3 leading-6 text-slate-700">
+                Recent averages: anxiety {averages.anxiety}/10, mood {averages.mood}/10, sleep {formatHours(averages.sleepHours)}, symptoms {averages.symptomLoad}/day.
+              </div>
+            </div>
+          ) : null}
+        </Card>
 
+        {doctorVisitSummary ? (
           <DoctorVisitSummaryPanel summary={doctorVisitSummary} />
-        </>
-      )}
+        ) : (
+          <Card className="rounded-[2rem] p-6 sm:p-7">
+            <h3 className="text-[1.45rem] font-semibold tracking-tight text-slate-900">
+              Add your medication when you want to.
+            </h3>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              That makes the dose view and appointment summary more useful, but you do not need it to keep logging.
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <ButtonLink href="/onboarding?step=medication">Add medication</ButtonLink>
+              <ExportLogsButton disabled={!logs.length} />
+            </div>
+          </Card>
+        )}
+      </section>
     </div>
   );
 }

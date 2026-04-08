@@ -19,7 +19,7 @@ export function formatCompactDate(value: string) {
 
 export function formatDose(value: number | null | undefined) {
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "0 mg";
+    return "Not added yet";
   }
 
   return `${Number(value).toFixed(Number.isInteger(value) ? 0 : 2)} mg`;

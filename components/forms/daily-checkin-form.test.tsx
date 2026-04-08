@@ -23,6 +23,8 @@ describe("DailyCheckInForm presets", () => {
         initialLog={null}
         logs={[]}
         today="2026-04-07"
+        isFirstLog
+        hasMedicationDetails={false}
       />,
     );
 
@@ -48,6 +50,8 @@ describe("DailyCheckInForm presets", () => {
         initialLog={null}
         logs={[]}
         today="2026-04-07"
+        isFirstLog
+        hasMedicationDetails={false}
       />,
     );
 

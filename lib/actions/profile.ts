@@ -13,20 +13,32 @@ export async function saveOnboardingAction(
 ): Promise<FormState> {
   const user = await requireUser("/onboarding");
   const benzoName = String(formData.get("benzoName") ?? "").trim();
-  const startingDose = Number(formData.get("startingDose") ?? 0);
   const currentDose = Number(formData.get("currentDose") ?? 0);
   const taperStartDate = String(formData.get("taperStartDate") ?? "");
-  const notes = String(formData.get("notes") ?? "").trim() || null;
+  const nextPath = getSafeNextPath(String(formData.get("nextPath") ?? "/dashboard"));
+  const supabase = await createServerSupabaseClient();
 
-  if (!benzoName || !taperStartDate || startingDose <= 0 || currentDose <= 0) {
+  if (!benzoName || !taperStartDate || currentDose <= 0) {
     return {
       status: "error",
-      message:
-        "Add your medication, taper starting dose, current dose, and taper start date.",
+      message: "Add your medication, current dose, and start date.",
     };
   }
 
-  const supabase = await createServerSupabaseClient();
+  const { data: existingProfile, error: existingProfileError } = await supabase
+    .from("profiles")
+    .select("starting_dose")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    return {
+      status: "error",
+      message: existingProfileError.message,
+    };
+  }
+
+  const startingDose = existingProfile?.starting_dose ?? currentDose;
 
   const { error } = await supabase.from("profiles").upsert(
     {
@@ -35,7 +47,6 @@ export async function saveOnboardingAction(
       starting_dose: startingDose,
       current_dose: currentDose,
       taper_start_date: taperStartDate,
-      notes,
     },
     { onConflict: "id" },
   );
@@ -57,18 +68,26 @@ export async function saveOnboardingAction(
     revalidatePath("/onboarding");
     revalidatePath("/dashboard");
     revalidatePath("/timeline");
-    revalidatePath("/");
+    revalidatePath("/log");
 
     return {
       status: "error",
       message:
-        "Your taper setup was saved, but we couldn't update the timeline right now.",
+        "Your medication details were saved, but the timeline may take a moment to catch up.",
     };
   }
 
   revalidatePath("/onboarding");
   revalidatePath("/dashboard");
   revalidatePath("/timeline");
-  revalidatePath("/");
-  redirect("/dashboard");
+  revalidatePath("/log");
+  redirect(nextPath);
+}
+
+function getSafeNextPath(target: string) {
+  if (!target.startsWith("/") || target.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return target;
 }

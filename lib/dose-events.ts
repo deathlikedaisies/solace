@@ -85,7 +85,7 @@ export async function syncDoseEventForDailyLog({
   userId: string;
   logId: string;
   logDate: string;
-  dose: number;
+  dose: number | null;
 }) {
   const supabase = await createServerSupabaseClient();
 
@@ -98,6 +98,21 @@ export async function syncDoseEventForDailyLog({
 
   if (linkedError) {
     throw new Error(linkedError.message);
+  }
+
+  if (dose === null) {
+    if (linkedEvent) {
+      const { error: deleteError } = await supabase
+        .from("dose_events")
+        .delete()
+        .eq("id", linkedEvent.id);
+
+      if (deleteError) {
+        throw new Error(deleteError.message);
+      }
+    }
+
+    return;
   }
 
   const previousKnownDose = await getPreviousKnownDose({
@@ -212,6 +227,7 @@ async function getPreviousKnownDose({
       .select("log_date, dose")
       .eq("user_id", userId)
       .lt("log_date", logDate)
+      .not("dose", "is", null)
       .order("log_date", { ascending: false })
       .limit(1),
     supabase
@@ -235,7 +251,7 @@ async function getPreviousKnownDose({
   const previousLog = previousLogResult.data?.[0]
     ? {
         date: previousLogResult.data[0].log_date,
-        dose: previousLogResult.data[0].dose,
+        dose: previousLogResult.data[0].dose as number,
       }
     : null;
 

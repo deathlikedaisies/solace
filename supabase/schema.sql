@@ -51,7 +51,7 @@ create table if not exists public.daily_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   log_date date not null,
-  dose double precision not null check (dose > 0),
+  dose double precision,
   anxiety integer not null check (anxiety between 0 and 10),
   mood integer not null check (mood between 0 and 10),
   sleep_quality integer not null check (sleep_quality between 0 and 10),
@@ -61,8 +61,19 @@ create table if not exists public.daily_logs (
   severe_flag boolean not null default false,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
-  constraint daily_logs_user_date_unique unique (user_id, log_date)
+  constraint daily_logs_user_date_unique unique (user_id, log_date),
+  constraint daily_logs_dose_positive check (dose is null or dose > 0)
 );
+
+alter table public.daily_logs
+  alter column dose drop not null;
+
+alter table public.daily_logs
+  drop constraint if exists daily_logs_dose_positive;
+
+alter table public.daily_logs
+  add constraint daily_logs_dose_positive
+  check (dose is null or dose > 0);
 
 create table if not exists public.dose_events (
   id uuid primary key default gen_random_uuid(),

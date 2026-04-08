@@ -1,21 +1,19 @@
 import type { DoseEventType, Database } from "@/lib/database.types";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import {
-  dateDiffInDays,
-  formatDose,
-  todayIso,
-} from "@/lib/utils";
+import { dateDiffInDays, formatDose, todayIso } from "@/lib/utils";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type DailyLog = Database["public"]["Tables"]["daily_logs"]["Row"];
 type DoseEvent = Database["public"]["Tables"]["dose_events"]["Row"];
+
+type DoseLog = DailyLog & { dose: number };
 
 export type TimelineItem =
   | {
       id: string;
       kind: "log";
       date: string;
-      dose: number;
+      dose: number | null;
       title: string;
       detail: string;
       note?: string | null;
@@ -64,8 +62,16 @@ export async function getProfile(userId: string) {
   return data as Profile | null;
 }
 
+export function hasMedicationDetails(profile: Profile | null) {
+  return Boolean(profile?.benzo_name && profile?.taper_start_date);
+}
+
 export function isProfileComplete(profile: Profile | null) {
-  return Boolean(profile && profile.starting_dose !== null);
+  return hasMedicationDetails(profile);
+}
+
+export function hasStartedTracking(logs: DailyLog[]) {
+  return logs.length > 0;
 }
 
 export async function getProfileAndLogs(userId: string) {
@@ -128,7 +134,9 @@ export async function getDashboardData(userId: string) {
 
   const allLogs = (logs as DailyLog[] | null) ?? [];
   const allEvents = (events as DoseEvent[] | null) ?? [];
+  const doseLogs = allLogs.filter(hasDose);
   const latestLog = allLogs.at(-1) ?? null;
+  const latestDoseLog = doseLogs.at(-1) ?? null;
   const todayLog = allLogs.find((log) => log.log_date === todayIso()) ?? null;
   const last7 = allLogs.slice(-7);
   const averages = {
@@ -141,7 +149,9 @@ export async function getDashboardData(userId: string) {
   return {
     profile: (profile as Profile | null) ?? null,
     logs: allLogs,
+    doseLogs,
     latestLog,
+    latestDoseLog,
     todayLog,
     events: allEvents,
     recentEvents: allEvents.slice(-8).reverse(),
@@ -265,9 +275,9 @@ function computeCheckInStreak(logs: DailyLog[]) {
 
 function buildPatternInsights(logs: DailyLog[], events: DoseEvent[]): DashboardInsight[] {
   const insights: DashboardInsight[] = [];
-  const latestLog = logs.at(-1);
+  const latestDoseLog = [...logs].reverse().find(hasDose) ?? null;
 
-  if (!latestLog) {
+  if (!latestDoseLog) {
     return insights;
   }
 
@@ -276,7 +286,7 @@ function buildPatternInsights(logs: DailyLog[], events: DoseEvent[]): DashboardI
   if (stableDoseDays >= 4) {
     insights.push({
       id: "dose-steady",
-      text: `Dose has stayed at ${formatDose(latestLog.dose)} for ${stableDoseDays} days.`,
+      text: `Dose has stayed at ${formatDose(latestDoseLog.dose)} for ${stableDoseDays} days.`,
     });
   }
 
@@ -320,15 +330,17 @@ function buildPatternInsights(logs: DailyLog[], events: DoseEvent[]): DashboardI
 }
 
 function countStableDoseDays(logs: DailyLog[]) {
-  if (!logs.length) {
+  const doseLogs = logs.filter(hasDose);
+
+  if (!doseLogs.length) {
     return 0;
   }
 
   let count = 1;
 
-  for (let index = logs.length - 1; index > 0; index -= 1) {
-    const current = logs[index];
-    const previous = logs[index - 1];
+  for (let index = doseLogs.length - 1; index > 0; index -= 1) {
+    const current = doseLogs[index];
+    const previous = doseLogs[index - 1];
 
     if (
       current.dose === previous.dose &&
@@ -369,17 +381,19 @@ function timelineEventCopy(eventType: DoseEventType, dose: number) {
 }
 
 function inferHoldMarkers(logs: DailyLog[]): TimelineItem[] {
-  if (logs.length < 7) {
+  const doseLogs = logs.filter(hasDose);
+
+  if (doseLogs.length < 7) {
     return [];
   }
 
   const markers: TimelineItem[] = [];
-  let streakStart = logs[0];
+  let streakStart = doseLogs[0];
   let streakCount = 1;
 
-  for (let index = 1; index <= logs.length; index += 1) {
-    const current = logs[index];
-    const previous = logs[index - 1];
+  for (let index = 1; index <= doseLogs.length; index += 1) {
+    const current = doseLogs[index];
+    const previous = doseLogs[index - 1];
     const continuing =
       current &&
       current.dose === previous.dose &&
@@ -406,4 +420,8 @@ function inferHoldMarkers(logs: DailyLog[]): TimelineItem[] {
   }
 
   return markers;
+}
+
+function hasDose(log: DailyLog): log is DoseLog {
+  return typeof log.dose === "number" && Number.isFinite(log.dose);
 }

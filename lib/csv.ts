@@ -19,7 +19,7 @@ const csvHeaders = [
 export function buildDailyLogsCsv(logs: DailyLog[]) {
   const rows = logs.map((log) => [
     log.log_date,
-    String(log.dose),
+    log.dose === null ? "" : String(log.dose),
     String(log.anxiety),
     String(log.mood),
     String(log.sleep_quality),

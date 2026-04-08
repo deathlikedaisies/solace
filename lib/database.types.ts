@@ -49,7 +49,7 @@ export interface Database {
           id: string;
           user_id: string;
           log_date: string;
-          dose: number;
+          dose: number | null;
           anxiety: number;
           mood: number;
           sleep_quality: number;
@@ -64,7 +64,7 @@ export interface Database {
           id?: string;
           user_id: string;
           log_date: string;
-          dose: number;
+          dose?: number | null;
           anxiety: number;
           mood: number;
           sleep_quality: number;
@@ -79,7 +79,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           log_date?: string;
-          dose?: number;
+          dose?: number | null;
           anxiety?: number;
           mood?: number;
           sleep_quality?: number;

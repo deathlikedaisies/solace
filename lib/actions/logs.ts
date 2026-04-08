@@ -15,7 +15,8 @@ export async function saveDailyCheckInAction(
   const supabase = await createServerSupabaseClient();
 
   const logDate = String(formData.get("logDate") ?? "");
-  const dose = Number(formData.get("dose") ?? 0);
+  const doseValue = String(formData.get("dose") ?? "").trim();
+  const dose = doseValue ? Number(doseValue) : null;
   const anxiety = Number(formData.get("anxiety") ?? 0);
   const mood = Number(formData.get("mood") ?? 0);
   const sleepQuality = Number(formData.get("sleepQuality") ?? 0);
@@ -31,10 +32,17 @@ export async function saveDailyCheckInAction(
     symptoms = [];
   }
 
-  if (!logDate || dose <= 0) {
+  if (!logDate) {
     return {
       status: "error",
-      message: "Add a valid date and dose before saving your entry.",
+      message: "Add a valid date before saving your note.",
+    };
+  }
+
+  if (doseValue && (dose === null || !Number.isFinite(dose) || dose <= 0)) {
+    return {
+      status: "error",
+      message: "Add a valid dose, or leave it blank for now.",
     };
   }
 
@@ -70,7 +78,7 @@ export async function saveDailyCheckInAction(
   if (error || !savedLog) {
     return {
       status: "error",
-      message: error?.message ?? "Unable to save your entry right now.",
+      message: error?.message ?? "Unable to save your note right now.",
     };
   }
 
@@ -87,23 +95,26 @@ export async function saveDailyCheckInAction(
     postSaveMessage = "Your timeline may take a moment to catch up.";
   }
 
-  const { error: profileUpdateError } = await supabase
-    .from("profiles")
-    .update({ current_dose: dose })
-    .eq("id", user.id);
+  if (dose !== null) {
+    const { error: profileUpdateError } = await supabase
+      .from("profiles")
+      .update({ current_dose: dose })
+      .eq("id", user.id);
 
-  if (profileUpdateError) {
-    postSaveMessage =
-      "A few details may take a moment to refresh across the app.";
+    if (profileUpdateError) {
+      postSaveMessage =
+        "A few details may take a moment to refresh across the app.";
+    }
   }
 
   revalidatePath("/dashboard");
   revalidatePath("/log");
   revalidatePath("/journal");
   revalidatePath("/timeline");
+  revalidatePath("/onboarding");
 
   return {
     status: "success",
-    message: postSaveMessage ?? "You can come back later if anything changes.",
+    message: postSaveMessage ?? "",
   };
 }
